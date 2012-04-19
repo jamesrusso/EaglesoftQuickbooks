@@ -1,0 +1,13 @@
+Version 3.0 - 7/2/2008
+	- added refund support. 
+
+Version 2.5 - 3/16/2008
+	- fixed problem with large deposit counts causing error.
+	- cleaned up splash screen.
+
+Version 2.2.0.0 - SVN revision 382 - 1/10/2007
+	
+	- Fixed sorting order of payments put into quickbooks. Now sorts first according to payment type id 
+	  from database and then sorts by transaction id. Just like the deposit slip printout.
+
+	- Fixed bug where doing multiple days without quiting would be additive. 
