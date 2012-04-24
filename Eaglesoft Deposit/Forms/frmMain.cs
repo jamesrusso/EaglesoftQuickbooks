@@ -229,6 +229,7 @@ namespace Eaglesoft_Deposit.Forms
 
         private void qbWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+        
             if (e.Error != null)
             {
                 setStatus(String.Format("An error occurred during QuickBooks import\n\n{0}\n\n{1}", e.Error.Message, e.Error.StackTrace));
@@ -241,6 +242,7 @@ namespace Eaglesoft_Deposit.Forms
                 DateTime depositDate = (DateTime)e.Result;
                 setStatus("Quickbooks export is complete.");
                 UserSettings.getInstance().Configuration.DatesRun.Add(depositDate);
+                UserSettings.getInstance().Configuration.LastTimeRun = (sender as QBDepositWorker).DepositDate;
                 UserSettings.getInstance().Save();
                 processDepositQueue();
             }

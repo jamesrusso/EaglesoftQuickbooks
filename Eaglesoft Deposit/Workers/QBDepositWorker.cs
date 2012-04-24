@@ -11,10 +11,10 @@ namespace Eaglesoft_Deposit.Workers
 {
     class QBDepositWorker : BackgroundWorker
     {
-        DailyDeposit _deposit;
-        List<Refund> _refunds;
-        Int32 _totalItems;
-        Int32 _currentItem;
+        private DailyDeposit _deposit;
+        private List<Refund> _refunds;
+        private Int32 _totalItems;
+        private Int32 _currentItem;
 
         public QBDepositWorker(LoadEaglesoftDataWorkerResults results)
         {
@@ -30,7 +30,7 @@ namespace Eaglesoft_Deposit.Workers
             return (Int16)(((Double)_currentItem / (Double)_totalItems) * 100);
         }
 
-        public void UpdateCustomer(Quickbooks qb, ICustomerRet customer, Refund r)
+        private void UpdateCustomer(Quickbooks qb, ICustomerRet customer, Refund r)
         {
             List<String> account = new List<string>();
             IMsgSetRequest msgRequest = qb.newRequest();
@@ -57,7 +57,7 @@ namespace Eaglesoft_Deposit.Workers
                 throw new Exception("Unable to add customer " + response.ResponseList.GetAt(0).StatusMessage);
         }
 
-        public void WriteRefundCheck(Quickbooks qb,
+        private void WriteRefundCheck(Quickbooks qb,
             Refund r)
         {
             ICustomerRet customer = FindCustomer(qb,r.FirstName, r.LastName);
@@ -91,7 +91,7 @@ namespace Eaglesoft_Deposit.Workers
             }
         }
 
-        public ICustomerRet addCustomer(Quickbooks qb, Refund r)
+        private ICustomerRet addCustomer(Quickbooks qb, Refund r)
         {
             IMsgSetRequest msgRequest = qb.newRequest();
             msgRequest.Attributes.OnError = ENRqOnError.roeStop;
@@ -124,7 +124,7 @@ namespace Eaglesoft_Deposit.Workers
             }
         }
 
-        public ICustomerRet FindCustomer(Quickbooks qb, String firstName, String lastName)
+        private ICustomerRet FindCustomer(Quickbooks qb, String firstName, String lastName)
         {
             IMsgSetRequest msgRequest = qb.newRequest();
             ICustomerQuery customerQuery = msgRequest.AppendCustomerQueryRq();
@@ -139,7 +139,7 @@ namespace Eaglesoft_Deposit.Workers
             return qbCustomers.GetAt(0);
         }
 
-        void QBDepositWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void QBDepositWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Quickbooks qb = new Quickbooks();
             List<Deposit> deposits = _deposit.getDeposits();
@@ -166,7 +166,7 @@ namespace Eaglesoft_Deposit.Workers
             }
         }
 
-        void doRefunds(Quickbooks qb, List<Refund> refunds, DoWorkEventArgs e)
+        private void doRefunds(Quickbooks qb, List<Refund> refunds, DoWorkEventArgs e)
         {
             foreach (Refund r in refunds)
             {
@@ -176,7 +176,7 @@ namespace Eaglesoft_Deposit.Workers
             }
         }
 
-        void doDeposits(Quickbooks qb,List<Deposit> deposits, DoWorkEventArgs e)
+        private void doDeposits(Quickbooks qb,List<Deposit> deposits, DoWorkEventArgs e)
         {
             
             foreach (Deposit deposit in deposits)
