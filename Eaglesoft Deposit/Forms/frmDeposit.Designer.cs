@@ -193,11 +193,6 @@ namespace Eaglesoft_Deposit.Forms
             this.comboDepositToAccount.Name = "comboDepositToAccount";
             this.comboDepositToAccount.Size = new System.Drawing.Size(259, 21);
             this.comboDepositToAccount.TabIndex = 1;
-            // 
-            // depositConfigPayTypesBindingSource
-            // 
-            this.depositConfigPayTypesBindingSource.DataSource = typeof(Eaglesoft_Deposit.Configuration.DepositConfigPayType);
-            // 
             // frmDeposit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);

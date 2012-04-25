@@ -184,6 +184,9 @@ namespace Eaglesoft_Deposit.Workers
 
         private void doRefunds(Quickbooks qb, List<Refund> refunds, DoWorkEventArgs e)
         {
+            if (UserSettings.getInstance().RefundConfiguration.Enabled == false)
+                return;
+
             foreach (Refund r in refunds)
             {
                 ReportProgress(calculatePercentageComplete(), String.Format("writing refund check to {0} {1}", r.FirstName, r.LastName));

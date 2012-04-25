@@ -34,7 +34,7 @@ Section "Programs"
   SetShellVarContext all
   File "${ProductDescription}\bin\${DebugOrRelease}\${ProductName}.exe"
   File "${ProductDescription}\bin\${DebugOrRelease}\${ProductName}.exe.config"
-  File "..\Halo3 Consulting QBSDK Library Installer\Release\Halo3 Consulting QBSDK Library Installer.msi"
+  File "..\QuickbooksLibraryInstaller\${DebugOrRelease}\Halo3 Consulting QBSDK Library Installer.msi"
   
   DetailPrint '... installing third party QB library.'
   ExecWait 'msiexec /i "Halo3 Consulting QBSDK Library Installer.msi" /qn'

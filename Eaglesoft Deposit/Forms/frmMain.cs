@@ -258,7 +258,7 @@ namespace Eaglesoft_Deposit.Forms
                 DateTime depositDate = (DateTime)e.Result;
                 setStatus("Quickbooks export is complete.");
                 UserSettings.getInstance().Configuration.DatesRun.Add(depositDate);
-                UserSettings.getInstance().Configuration.LastTimeRun = (sender as QBDepositWorker).DepositDate;
+                UserSettings.getInstance().Configuration.LastTimeRun = depositDate;
                 UserSettings.getInstance().Save();
                 processDepositQueue();
             }

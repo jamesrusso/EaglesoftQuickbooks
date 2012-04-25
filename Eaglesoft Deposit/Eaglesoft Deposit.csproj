@@ -203,6 +203,7 @@
     <Content Include="eaglesoftquickbooks-16x16.ico" />
     <Content Include="eaglesoftquickbooks.ico" />
     <Content Include="IntuitLibs.vdproj" />
+    <Content Include="LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
