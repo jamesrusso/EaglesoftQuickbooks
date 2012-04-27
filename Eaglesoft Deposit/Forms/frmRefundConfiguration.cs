@@ -50,21 +50,21 @@ namespace Eaglesoft_Deposit
 
             InitializeComponent();
 
-            comboBoxQuickbooksIncomeAccount.DataSource = _qbIncomeAccounts;
             comboBoxEaglesoftAdjustmentTypes.DataSource = _esAdjustmentTypes;
             comboBoxEaglesoftAdjustmentTypes.DisplayMember = "description";
             comboBoxEaglesoftAdjustmentTypes.ValueMember = "id";
-            
+            comboBoxEaglesoftAdjustmentTypes.SelectedValue = _config.ESAdjustmentId;
             if (_config.ESAdjustmentId == 0)
                 _config.ESAdjustmentId = _esAdjustmentTypes[0].Id;
 
-            comboBoxEaglesoftAdjustmentTypes.SelectedValue = _config.ESAdjustmentId;
-          
-            checkBoxRefundsEnabled.Checked = _config.Enabled;
-            comboBoxEaglesoftAdjustmentTypes.Enabled = checkBoxRefundsEnabled.Checked;
-            comboBoxQuickbooksCheckingAccount.DataSource = _qbCheckingAccounts;
+            
+            comboBoxQuickbooksIncomeAccount.DataSource = _qbIncomeAccounts;
+            comboBoxQuickbooksIncomeAccount.SelectedItem = _config.QBExpenseAccount;
 
-            comboBoxQuickbooksCheckingAccount.SelectedText = _config.QBCheckingAccount;
+            comboBoxQuickbooksCheckingAccount.DataSource = _qbCheckingAccounts;
+            comboBoxQuickbooksCheckingAccount.SelectedItem = _config.QBCheckingAccount;
+            
+            checkBoxRefundsEnabled.Checked = _config.Enabled;
             comboBoxQuickbooksCheckingAccount.Enabled = checkBoxRefundsEnabled.Checked;
             comboBoxQuickbooksIncomeAccount.Enabled = checkBoxRefundsEnabled.Checked;
             comboBoxEaglesoftAdjustmentTypes.Enabled = checkBoxRefundsEnabled.Checked;
