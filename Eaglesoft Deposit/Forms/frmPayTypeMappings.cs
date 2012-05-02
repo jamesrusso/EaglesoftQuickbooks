@@ -121,18 +121,23 @@ namespace Eaglesoft_Deposit
 
             this.Invoke((MethodInvoker)delegate
             {
-                _currentPayType = configuration.PayTypes[0];
+                _currentPayType = null;
+                Configuration.PayType _initialPayType = configuration.PayTypes[0];
+                
                 comboQbAccount.DataSource = quickbooksAccounts;
-                comboQbAccount.SelectedItem = _currentPayType.IncomeAccount;
+                comboQbAccount.SelectedItem = _initialPayType.IncomeAccount;
 
                 comboQbPayType.DataSource = quickbooksPaymentTypes;
-                comboQbPayType.SelectedItem = _currentPayType.QuickbooksPayType;
+                comboQbPayType.SelectedItem = _initialPayType.QuickbooksPayType;
 
                 comboQbFrom.DataSource = quickbooksCustomers;
-                comboQbFrom.SelectedItem = _currentPayType.Customer;
+                comboQbFrom.SelectedItem = _initialPayType.Customer;
 
                 listBox1.DataSource = configuration.PayTypes;
                 listBox1.DisplayMember = "EaglesoftPayType";
+                
+                // This is done this way to prevent the first object from getting overridden when we set the DataSource.
+                _currentPayType = _initialPayType;
             });
             setStatus("");
             UserSettings.getInstance().Save();
