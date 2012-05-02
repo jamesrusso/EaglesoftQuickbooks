@@ -39,6 +39,7 @@ namespace Eaglesoft_Deposit.Forms
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setLastRunTimeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reRunInitialSetupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sinceLastImportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.todayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,7 +49,6 @@ namespace Eaglesoft_Deposit.Forms
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.reRunInitialSetupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -68,7 +68,7 @@ namespace Eaglesoft_Deposit.Forms
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(581, 318);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(772, 424);
             this.tableLayoutPanel1.TabIndex = 5;
             // 
             // menuStrip1
@@ -81,7 +81,7 @@ namespace Eaglesoft_Deposit.Forms
             this.cancelImportToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(581, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(772, 30);
             this.menuStrip1.TabIndex = 17;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -149,6 +149,13 @@ namespace Eaglesoft_Deposit.Forms
             this.setLastRunTimeToolStripMenuItem.Text = "Set Last Run Time";
             this.setLastRunTimeToolStripMenuItem.Click += new System.EventHandler(this.setLastRunTimeToolStripMenuItem_Click);
             // 
+            // reRunInitialSetupToolStripMenuItem
+            // 
+            this.reRunInitialSetupToolStripMenuItem.Name = "reRunInitialSetupToolStripMenuItem";
+            this.reRunInitialSetupToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.reRunInitialSetupToolStripMenuItem.Text = "Re-Run initial Setup";
+            this.reRunInitialSetupToolStripMenuItem.Click += new System.EventHandler(this.reRunInitialSetupToolStripMenuItem_Click);
+            // 
             // importDataToolStripMenuItem
             // 
             this.importDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -198,7 +205,7 @@ namespace Eaglesoft_Deposit.Forms
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(575, 282);
+            this.textBox1.Size = new System.Drawing.Size(766, 388);
             this.textBox1.TabIndex = 18;
             // 
             // statusStrip1
@@ -226,21 +233,15 @@ namespace Eaglesoft_Deposit.Forms
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
             // 
-            // reRunInitialSetupToolStripMenuItem
-            // 
-            this.reRunInitialSetupToolStripMenuItem.Name = "reRunInitialSetupToolStripMenuItem";
-            this.reRunInitialSetupToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.reRunInitialSetupToolStripMenuItem.Text = "Re-Run initial Setup";
-            this.reRunInitialSetupToolStripMenuItem.Click += new System.EventHandler(this.reRunInitialSetupToolStripMenuItem_Click);
-            // 
             // frmMain
             // 
-            this.ClientSize = new System.Drawing.Size(581, 340);
+            this.ClientSize = new System.Drawing.Size(772, 446);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(0, 324);
             this.MainMenuStrip = this.menuStrip1;
+            this.MinimumSize = new System.Drawing.Size(780, 480);
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Eaglesoft Quickbooks Deposit";

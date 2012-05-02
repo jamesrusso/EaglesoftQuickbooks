@@ -43,7 +43,6 @@ namespace Eaglesoft_Deposit.Workers
             WorkerSupportsCancellation = true;
         }
 
-
         private Int32 calculatePercentageComplete()
         {
             return (Int32)(((Double)_queryCount / (Double)_totalQueryCount) * 100);
@@ -184,25 +183,28 @@ namespace Eaglesoft_Deposit.Workers
 
         private void LoadEaglesoftDataWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-
+            ReportProgress(0, "connecting to database...");
             OdbcConnection dbConnection = new OdbcConnection(UserSettings.getInstance().Configuration.DSN);
-
             dbConnection.Open();
+            ReportProgress(0, "getting trasaction range...");
             DailyTransactionRange rangeToLoad = getTransactionRangeFor(dbConnection, _date);
             if (rangeToLoad == null)
             {
                 e.Result = null;
-                ReportProgress(0, "no transactions found");
+                ReportProgress(0, "no transactions found,");
                 return;
             }
 
             _queryCount = 0;
+            ReportProgress(0, String.Format("found {0} transactions...", rangeToLoad.ToTxn - rangeToLoad.FromTxn));
+            ReportProgress(0, "getting actual payment counts...");
             _totalQueryCount = getPaymentCount(dbConnection, rangeToLoad) + getBulkPaymentCount(dbConnection, rangeToLoad);
             ReportProgress(calculatePercentageComplete());
 
             if (UserSettings.getInstance().RefundConfiguration.Enabled)
                 _totalQueryCount += getRefundCount(dbConnection, rangeToLoad);
 
+            ReportProgress(calculatePercentageComplete(), "loading payments...");
             DailyDeposit deposit = loadPayments(dbConnection, rangeToLoad, e);
 
             List<Refund> refunds = null;
@@ -211,7 +213,7 @@ namespace Eaglesoft_Deposit.Workers
             {
                 refunds = loadRefunds(dbConnection, rangeToLoad, e);
             }
-
+            ReportProgress(calculatePercentageComplete(), "finished...");
             e.Result = new LoadEaglesoftDataWorkerResults(deposit, refunds);
         }
 
@@ -294,6 +296,7 @@ namespace Eaglesoft_Deposit.Workers
 
             while (reader.Read())
             {
+                
                 if (CancellationPending)
                 {
                     e.Cancel = true;
@@ -314,6 +317,7 @@ namespace Eaglesoft_Deposit.Workers
                     _queryCount++;
                     ReportProgress(calculatePercentageComplete());
                     fixupCheckNumber(p);
+                    ReportProgress(calculatePercentageComplete(), String.Format("adding payment {0}, {1}, {2}", p.TxnId, p.PayType, p.Amount));
                     dailyDeposit.addPayment(p);
                 }
                 else

@@ -106,7 +106,7 @@ namespace Eaglesoft_Deposit.Forms
             {
                 eaglesoftLoadDataWorker.Date = dateTime;
                 toolStripProgressBar1.Visible = true;
-                setStatus(String.Format("loading data for for {0:MM/dd/yy}", dateTime));
+                setStatus(String.Format("loading data for {0:MM/dd/yy}", dateTime));
                 eaglesoftLoadDataWorker.RunWorkerAsync();
             }
         }
@@ -206,7 +206,7 @@ namespace Eaglesoft_Deposit.Forms
 
             if (e.Error != null)
             {
-                MessageBox.Show(e.Error.Message);
+                MessageBox.Show(e.Error.Message+"\n\n"+e.Error.StackTrace);
                 toolStripProgressBar1.Visible = false;
                 setupDepositsToolStripMenuItem.Enabled = true;
                 importDataToolStripMenuItem.Enabled = true;
@@ -222,7 +222,7 @@ namespace Eaglesoft_Deposit.Forms
 
             LoadEaglesoftDataWorkerResults results = e.Result as LoadEaglesoftDataWorkerResults;
             if (results.Deposit == null && results.Refunds == null) {
-                setStatus(String.Format("do payments or refund results for {0:MM/dd/yy}", worker.Date));
+                setStatus(String.Format("no payments or refund results for {0:MM/dd/yy}", worker.Date));
                 processDepositQueue();
             } else  {
                 toolStripProgressBar1.Value = 0;
@@ -245,7 +245,6 @@ namespace Eaglesoft_Deposit.Forms
 
         private void qbWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-        
             if (e.Error != null)
             {
                 setStatus(String.Format("An error occurred during QuickBooks import\n\n{0}\n\n{1}", e.Error.Message, e.Error.StackTrace));
