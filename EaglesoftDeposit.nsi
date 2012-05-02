@@ -33,6 +33,7 @@ Section "Programs"
   SetOutPath "$INSTDIR"
   SetShellVarContext all
   File "${ProductDescription}\bin\${DebugOrRelease}\${ProductName}.exe"
+  File "${ProductDescription}\bin\${DebugOrRelease}\${ProductName}.pdb"
   File "${ProductDescription}\bin\${DebugOrRelease}\${ProductName}.exe.config"
   File "..\QuickbooksLibraryInstaller\${DebugOrRelease}\Halo3 Consulting QBSDK Library Installer.msi"
   
@@ -59,6 +60,7 @@ Section "uninstall"
 
   Delete /REBOOTOK "$INSTDIR\Halo3 Consulting QBSDK Library Installer.msi"
   Delete /REBOOTOK "$INSTDIR\${ProductName}.exe"
+  Delete /REBOOTOK "$INSTDIR\${ProductName}.pdb"
   Delete /REBOOTOK "$INSTDIR\${ProductName}.exe.config"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${ProductName}"
 SectionEnd
