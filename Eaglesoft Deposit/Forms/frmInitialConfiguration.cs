@@ -86,12 +86,12 @@ namespace Eaglesoft_Deposit.Forms
             try
             {
                 es.Connect();
+                UserSettings.getInstance().Configuration.refreshPaymentTypes(es.GetEaglesoftPayTypes());
+                es.Disconnect();
                 btnEaglesoftDBTesxt.Enabled = false;
                 lblESPassFail.Text = "Pass";
                 lblESPassFail.ForeColor = Color.Green;
                 lblESPassFail.Visible = true;
-                UserSettings.getInstance().Configuration.refreshPaymentTypes(es.GetEaglesoftPayTypes());
-                es.Disconnect();
                 grpBoxEaglesoft.Visible = false;
                 grpBoxQuickbooks.Location = grpBoxEaglesoft.Location;
                 grpBoxQuickbooks.Visible = true;
