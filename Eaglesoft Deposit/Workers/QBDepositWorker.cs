@@ -92,7 +92,7 @@ namespace Eaglesoft_Deposit.Workers
 
             addCheckRequest.AccountRef.FullName.SetValue(UserSettings.getInstance().RefundConfiguration.QBCheckingAccount);
             IExpenseLineAdd expenseAdd = addCheckRequest.ExpenseLineAddList.Append();
-            expenseAdd.AccountRef.FullName.SetValue("Fee Refunds");
+            expenseAdd.AccountRef.FullName.SetValue(UserSettings.getInstance().RefundConfiguration.QBExpenseAccount);
             expenseAdd.Amount.SetValue((double)r.Amount);
             expenseAdd.Memo.SetValue(r.Description);
 
