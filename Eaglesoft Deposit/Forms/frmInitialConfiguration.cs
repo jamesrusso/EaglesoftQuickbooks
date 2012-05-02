@@ -106,18 +106,52 @@ namespace Eaglesoft_Deposit.Forms
         {
             try
             {
+                Boolean fail = false;
                 Quickbooks qb = new Quickbooks();
                 qb.Connect();
-                lblQuickbooksPassFail.Text = "Pass";
-                lblQuickbooksPassFail.ForeColor = Color.Green;
-                lblQuickbooksPassFail.Visible = true;
-                btnQuickbooksTest.Enabled = false;
+
+                List<String> bankAccounts = qb.getBankAccounts();
+                if (bankAccounts.Count == 0)
+                {
+                    MessageBox.Show("No bank accounts setup in QB? Cannot continue.");
+                    fail = true; 
+                }
+                List<String> incomeAccounts = qb.getIncomeAccounts();
+
+                if (incomeAccounts.Count == 0)
+                {
+                    MessageBox.Show("No income accounts setup in QB? Cannot continue.");
+                    fail = true;
+                }
+                List<String> customers = qb.getCustomers();
+
+                if (customers.Count == 0)
+                {
+                    fail = true;
+                    MessageBox.Show("No customers found in QB? Cannot continue.");
+                }
+                
                 qb.Disconnect();
-                UserSettings.getInstance().Configuration.InitialConfigurationComplete = true;
-                UserSettings.getInstance().Configuration.LastTimeRun = DateTime.Now.AddDays(-1);
-                UserSettings.getInstance().Save();
-         
-                finishConfiguration();
+
+                if (fail == false)
+                {
+                    lblQuickbooksPassFail.Text = "Pass";
+                    lblQuickbooksPassFail.ForeColor = Color.Green;
+                    lblQuickbooksPassFail.Visible = true;
+                    btnQuickbooksTest.Enabled = false;
+
+                    UserSettings.getInstance().Configuration.InitialConfigurationComplete = true;
+                    UserSettings.getInstance().Configuration.LastTimeRun = DateTime.Now.AddDays(-1);
+                    UserSettings.getInstance().Save();
+                    finishConfiguration();
+                }
+                else
+                {
+                    lblQuickbooksPassFail.Text = "Fail";
+                    lblQuickbooksPassFail.ForeColor = Color.Red;
+                    lblQuickbooksPassFail.Visible = true;
+                    btnQuickbooksTest.Enabled = true;
+                }
             }
             catch (Exception ex)
             {
