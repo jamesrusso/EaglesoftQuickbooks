@@ -20,33 +20,36 @@ using System.Data.Odbc;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Text;
-using Eaglesoft_Deposit.Business_Objects;
-using Interop.QBFC11;
+using Eaglesoft_Deposit.Model;
+using QBFC13Lib;
 
 namespace Eaglesoft_Deposit.Workers
 {
     class QBDepositWorker : BackgroundWorker
     {
-        private DailyDeposit _deposit;
-        private List<Refund> _refunds;
-        private Int32 _totalItems;
-        private Int32 _currentItem;
+        private Int32 TotalItems;
+        private Int32 CurrentItem;
+        private DailyDeposit _dailyDeposit;
 
-        public QBDepositWorker(LoadEaglesoftDataWorkerResults results)
+        public QBDepositWorker(DailyDeposit dailyDeposit)
         {
+            _dailyDeposit = dailyDeposit;
             DoWork += new DoWorkEventHandler(QBDepositWorker_DoWork);
             WorkerReportsProgress = true;
             WorkerSupportsCancellation = true;
-            _deposit = results.Deposit;
-            _refunds = results.Refunds;
         }
 
-        public Int32 calculatePercentageComplete()
+        public void ReportProgress(String message)
         {
-            return (Int16)(((Double)_currentItem / (Double)_totalItems) * 100);
+            ReportProgress((Int16)(((Double)CurrentItem / (Double)TotalItems) * 100), message);
         }
 
-        private void UpdateCustomer(Quickbooks qb, ICustomerRet customer, Refund r)
+        public void ReportProgress()
+        {
+            ReportProgress(null as String);
+        }
+
+        private void UpdateCustomer(Quickbooks qb, ICustomerRet customer, CheckToWrite r)
         {
             List<String> account = new List<string>();
             IMsgSetRequest msgRequest = qb.newRequest();
@@ -54,10 +57,8 @@ namespace Eaglesoft_Deposit.Workers
             ICustomerMod customerMod = msgRequest.AppendCustomerModRq();
 
             customerMod.ListID.SetValue(customer.ListID.GetValue());
-            customerMod.AccountNumber.SetValue(r.PatientId);
-            customerMod.Name.SetValue(r.FirstName + " " + r.LastName);
-            customerMod.FirstName.SetValue(r.FirstName);
-            customerMod.LastName.SetValue(r.LastName);
+            customerMod.AccountNumber.SetValue(r.RecipientId);
+            customerMod.Name.SetValue(r.FullName);
             customerMod.BillAddress.Addr1.SetValue(customerMod.Name.GetValue());
             customerMod.BillAddress.Addr2.SetValue(r.Address1);
             customerMod.BillAddress.Addr3.SetValue(r.Address2);
@@ -70,16 +71,15 @@ namespace Eaglesoft_Deposit.Workers
             IMsgSetResponse response = qb.performRequest(msgRequest);
 
             if (response.ResponseList.GetAt(0).StatusCode != 0)
-                throw new Exception("Unable to add customer " + response.ResponseList.GetAt(0).StatusMessage);
+                throw new Exception("Unable to update customer " + response.ResponseList.GetAt(0).StatusMessage);
         }
 
-        private void WriteRefundCheck(Quickbooks qb,
-            Refund r)
+        private void WriteRefundCheck(Quickbooks qb, CheckToWrite r)
         {
-            ICustomerRet customer = FindCustomer(qb,r.FirstName, r.LastName);
+            ICustomerRet customer = FindCustomer(qb, r.FullName);
 
             if (customer == null)
-                customer = addCustomer(qb,r);
+                customer = addCustomer(qb, r);
             else
                 UpdateCustomer(qb, customer, r);
 
@@ -89,12 +89,12 @@ namespace Eaglesoft_Deposit.Workers
             ICheckAdd addCheckRequest = msgRequest.AppendCheckAddRq();
             addCheckRequest.PayeeEntityRef.ListID.SetValue(customer.ListID.GetValue());
 
-
-            addCheckRequest.AccountRef.FullName.SetValue(UserSettings.getInstance().RefundConfiguration.QBCheckingAccount);
+            addCheckRequest.Memo.SetValue(r.Memo);
+            addCheckRequest.AccountRef.FullName.SetValue(r.QbBankAccount);
             IExpenseLineAdd expenseAdd = addCheckRequest.ExpenseLineAddList.Append();
-            expenseAdd.AccountRef.FullName.SetValue(UserSettings.getInstance().RefundConfiguration.QBExpenseAccount);
+            expenseAdd.AccountRef.FullName.SetValue(r.QbIncomeAccount);
             expenseAdd.Amount.SetValue((double)r.Amount);
-            expenseAdd.Memo.SetValue(r.Description);
+            expenseAdd.Memo.SetValue(r.Memo);
 
             addCheckRequest.IsToBePrinted.SetValue(true);
             addCheckRequest.RefNumber.SetEmpty();
@@ -107,21 +107,18 @@ namespace Eaglesoft_Deposit.Workers
             }
         }
 
-        private ICustomerRet addCustomer(Quickbooks qb, Refund r)
+        private ICustomerRet addCustomer(Quickbooks qb, CheckToWrite r)
         {
             IMsgSetRequest msgRequest = qb.newRequest();
             msgRequest.Attributes.OnError = ENRqOnError.roeStop;
 
             ICustomerAdd addCustomer = msgRequest.AppendCustomerAddRq();
 
-            addCustomer.AccountNumber.SetValue(r.PatientId);
-            addCustomer.Name.SetValue(r.FirstName + " " + r.LastName);
-            addCustomer.FirstName.SetValue(r.FirstName);
-            addCustomer.LastName.SetValue(r.LastName);
+            addCustomer.AccountNumber.SetValue(r.RecipientId);
+            addCustomer.Name.SetValue(r.FullName);
             addCustomer.BillAddress.Addr1.SetValue(addCustomer.Name.GetValue());
             addCustomer.BillAddress.Addr2.SetValue(r.Address1);
             addCustomer.BillAddress.Addr3.SetValue(r.Address2);
-
             addCustomer.Contact.SetValue(addCustomer.Name.GetValue());
             addCustomer.BillAddress.City.SetValue(r.City);
             addCustomer.BillAddress.State.SetValue(r.State);
@@ -140,11 +137,11 @@ namespace Eaglesoft_Deposit.Workers
             }
         }
 
-        private ICustomerRet FindCustomer(Quickbooks qb, String firstName, String lastName)
+        private ICustomerRet FindCustomer(Quickbooks qb, String fullName)
         {
             IMsgSetRequest msgRequest = qb.newRequest();
             ICustomerQuery customerQuery = msgRequest.AppendCustomerQueryRq();
-            customerQuery.ORCustomerListQuery.FullNameList.Add(firstName + " " + lastName);
+            customerQuery.ORCustomerListQuery.FullNameList.Add(fullName);
             IMsgSetResponse response = qb.performRequest(msgRequest);
 
             ICustomerRetList qbCustomers = (ICustomerRetList)response.ResponseList.GetAt(0).Detail;
@@ -158,23 +155,31 @@ namespace Eaglesoft_Deposit.Workers
         private void QBDepositWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Quickbooks qb = new Quickbooks();
-            List<Deposit> deposits = _deposit.getDeposits();
-            _currentItem = 0;
-            _totalItems = deposits.Count;
-            if (_refunds != null) 
-                _totalItems += _refunds.Count;
-            e.Result = _deposit.DepositDate;
-            ReportProgress(calculatePercentageComplete());
-            
+            List<Deposit> deposits = _dailyDeposit.getDeposits();
+            List<CheckToWrite> checksToWrite = _dailyDeposit.ChecksToWrite;
+            CurrentItem = 0;
+            TotalItems = deposits.Count + checksToWrite.Count;
+
+            e.Result = _dailyDeposit.DepositDate;
+            ReportProgress();
             try
             {
                 qb.Connect();
 
-                doDeposits(qb, deposits, e);
+                foreach (Deposit deposit in deposits)
+                {
+                    performDeposit(qb, deposit);
+                    CurrentItem++;
+                    ReportProgress();
+                }
 
-                if (e.Cancel == false)
-                    doRefunds(qb, _refunds, e);
-
+                foreach (CheckToWrite checkToWrite in checksToWrite)
+                {
+                    ReportProgress(String.Format("writing refund check to {0} for {1:c}", checkToWrite.FullName, checkToWrite.Amount));
+                    WriteRefundCheck(qb, checkToWrite);
+                    CurrentItem++;
+                    ReportProgress();
+                }
             }
             finally
             {
@@ -182,63 +187,40 @@ namespace Eaglesoft_Deposit.Workers
             }
         }
 
-        private void doRefunds(Quickbooks qb, List<Refund> refunds, DoWorkEventArgs e)
+        private void performDeposit(Quickbooks qb, Deposit deposit)
         {
-            if (UserSettings.getInstance().RefundConfiguration.Enabled == false)
-                return;
+            IMsgSetRequest qbRequests = qb.newRequest();
+            qbRequests.Attributes.OnError = ENRqOnError.roeStop;
+            IDepositAdd depositAddRequest = qbRequests.AppendDepositAddRq();
+            depositAddRequest.Memo.SetValue(deposit.DepositConfig.Memo);
+            depositAddRequest.TxnDate.SetValue(_dailyDeposit.DepositDate);
+            depositAddRequest.DepositToAccountRef.FullName.SetValue(deposit.DepositConfig.BankAccount.Name);
 
-            foreach (Refund r in refunds)
+            foreach (DepositLine line in deposit.Lines)
             {
-                ReportProgress(calculatePercentageComplete(), String.Format("writing refund check to {0} {1}", r.FirstName, r.LastName));
-                _currentItem++;
-                WriteRefundCheck(qb, r);
+                IDepositLineAdd depositLineAdd = depositAddRequest.DepositLineAddList.Append();
+                depositLineAdd.ORDepositLineAdd.DepositInfo.EntityRef.FullName.SetValue(line.Customer);
+                depositLineAdd.ORDepositLineAdd.DepositInfo.AccountRef.FullName.SetValue(line.IncomeAccount);
+                depositLineAdd.ORDepositLineAdd.DepositInfo.Amount.SetValue(line.Amount);
+
+                if (line.CheckNumber != null)
+                    depositLineAdd.ORDepositLineAdd.DepositInfo.CheckNumber.SetValue(line.CheckNumber.Substring(0, Math.Min(line.CheckNumber.Length, 11)));
+
+                depositLineAdd.ORDepositLineAdd.DepositInfo.PaymentMethodRef.FullName.SetValue(line.PaymentMethod);
+
+                if (line.Memo != null)
+                    depositLineAdd.ORDepositLineAdd.DepositInfo.Memo.SetValue(line.Memo);
             }
-        }
 
-        private void doDeposits(Quickbooks qb,List<Deposit> deposits, DoWorkEventArgs e)
-        {
-            
-            foreach (Deposit deposit in deposits)
+            IMsgSetResponse response = qb.performRequest(qbRequests);
+            List<IResponse> errors = new List<IResponse>();
+            for (int i = 0; i < response.ResponseList.Count; i++)
             {
-
-                _currentItem++;
-                IMsgSetRequest qbRequests = qb.newRequest();
-                qbRequests.Attributes.OnError = ENRqOnError.roeStop;
-                IDepositAdd depositAddRequest = qbRequests.AppendDepositAddRq();
-                depositAddRequest.Memo.SetValue(deposit.DepositConfig.Memo);
-                depositAddRequest.TxnDate.SetValue(_deposit.DepositDate);
-                depositAddRequest.DepositToAccountRef.FullName.SetValue(deposit.DepositConfig.BankAccount);
-
-                foreach (DepositLine line in deposit.Lines)
+                if (response.ResponseList.GetAt(i).StatusCode != 0)
                 {
-                    IDepositLineAdd depositLineAdd = depositAddRequest.DepositLineAddList.Append();
-                    depositLineAdd.ORDepositLineAdd.DepositInfo.EntityRef.FullName.SetValue(line.Customer);
-                    depositLineAdd.ORDepositLineAdd.DepositInfo.AccountRef.FullName.SetValue(line.IncomeAccount);
-                    depositLineAdd.ORDepositLineAdd.DepositInfo.Amount.SetValue(line.Amount);
-
-                    if (line.CheckNumber != null)
-                        depositLineAdd.ORDepositLineAdd.DepositInfo.CheckNumber.SetValue(line.CheckNumber.Substring(0, Math.Min(line.CheckNumber.Length, 11)));
-
-                    depositLineAdd.ORDepositLineAdd.DepositInfo.PaymentMethodRef.FullName.SetValue(line.PaymentMethod);
-
-                    if (line.Memo != null)
-                        depositLineAdd.ORDepositLineAdd.DepositInfo.Memo.SetValue(line.Memo);
-                }
-
-                ReportProgress(calculatePercentageComplete(), String.Format("adding deposit {0}", deposit.DepositConfig.Memo)); ;
-                IMsgSetResponse response = qb.performRequest(qbRequests);
-                List<IResponse> errors = new List<IResponse>();
-                for (int i = 0; i < response.ResponseList.Count; i++)
-                {
-                    if (response.ResponseList.GetAt(i).StatusCode != 0)
-                    {
-                        throw new Exception(String.Format("Failed to perform deposit {0}", response.ResponseList.GetAt(i).StatusMessage));
-                    }
+                    throw new Exception(String.Format("Failed to perform deposit {0}", response.ResponseList.GetAt(i).StatusMessage));
                 }
             }
         }
     }
-
 }
-
-

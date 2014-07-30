@@ -21,6 +21,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Eaglesoft_Deposit.Forms;
+using Eaglesoft_Deposit.Model;
 
 
 namespace Eaglesoft_Deposit
@@ -31,29 +32,20 @@ namespace Eaglesoft_Deposit
         /// The main entry point for the application.
         /// </summary>
         /// 
-     
+
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
-            if (UserSettings.getInstance().Configuration.InitialConfigurationComplete == false)
-            {
-                frmInitialConfiguration frm = new frmInitialConfiguration();
-                if (frm.ShowDialog() == DialogResult.OK)
-                    Application.Run(new frmMain());
-
-            } else { 
-
             Application.Run(new frmMain());
-                }
             Properties.Settings.Default.Save();
         }
 
         static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
-            if (e.Exception is  Quickbooks.QuickbooksConnectionException)
+            if (e.Exception is Quickbooks.QuickbooksConnectionException)
             {
                 MessageBox.Show("It appears that QuickBooks is not running?", "Quickbooks running", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

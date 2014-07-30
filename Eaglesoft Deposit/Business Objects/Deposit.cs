@@ -17,25 +17,25 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Interop.QBFC11;
+using Eaglesoft_Deposit.Model;
 
-namespace Eaglesoft_Deposit.Business_Objects
+namespace Eaglesoft_Deposit.Model
 {
     /// <summary>
-    /// This class represents a single deposit to be made to quickbooks. It will include 1 or more of payments.
+    /// This class represents a single deposit to be made to quickbooks. It will include 1 or more line of payments and possibily refunds.
     /// </summary>
     public class Deposit : IComparable<Deposit>
     {
-        Dictionary<String, Int32> _payTypeCounts = new Dictionary<String, int>();
-        Configuration.DepositConfig _depositConfig;
+        Dictionary<QuickbooksPaytype, Int32> _payTypeCounts = new Dictionary<QuickbooksPaytype, int>();
+        DepositConfiguration _depositConfig;
         List<DepositLine> _lines;
 
-        public Configuration.DepositConfig DepositConfig
+        public DepositConfiguration DepositConfig
         {
             get { return _depositConfig; }
         } 
 
-        public Deposit(Configuration.DepositConfig depositConfig)
+        public Deposit(DepositConfiguration depositConfig)
         {
             _depositConfig = depositConfig;
             _lines = new List<DepositLine>();
@@ -48,9 +48,8 @@ namespace Eaglesoft_Deposit.Business_Objects
 
         /**
          * Return true if we cannot accept any more of the specified deposit pay type. 
-         * 
          */
-        public Boolean isFull(String qbPayType) 
+        public Boolean isFull(QuickbooksPaytype qbPayType) 
         {
             if (_payTypeCounts.ContainsKey(qbPayType) &&  _payTypeCounts[qbPayType] == _depositConfig.getMaximum(qbPayType))
                 return true;
@@ -58,13 +57,27 @@ namespace Eaglesoft_Deposit.Business_Objects
                 return false;
         }
 
-        public void addPayment(Payment p)
+        public void addRefund(EaglesoftRefund refund)
         {
-            Configuration.PayType payType = UserSettings.getInstance().Configuration.getPayTypeByEaglesoftPayType(p.PayType);
-            DepositLine line = new DepositLine(p);
-            line.IncomeAccount = payType.IncomeAccount;
-            line.PaymentMethod = payType.QuickbooksPayType;
-            line.Customer = payType.Customer;
+            RefundTypeMapping mapping = UserSettings.getInstance().Configuration.getRefundTypeByEaglesoftAdjustmentType(refund.AdjustmentType);
+            DepositLine line = new DepositLine();
+            line.Customer = mapping.Customer.Name;
+            line.Amount = -refund.Amount;
+            line.IncomeAccount = mapping.IncomeAccount.Name;
+            line.PaymentMethod = mapping.QuickbooksPaytype.Name;
+            line.Memo = refund.Description;
+            _lines.Add(line);
+        }
+
+        public void addPayment(EaglesoftPayment p)
+        {
+            PaytypeMapping payType = UserSettings.getInstance().Configuration.getPayTypeByEaglesoftPayType(p.EaglesoftPayType);
+            DepositLine line = new DepositLine();
+            line.Amount = p.Amount;
+            line.IncomeAccount = payType.IncomeAccount.Name;
+            line.PaymentMethod = payType.QuickbooksPayType.Name;
+            line.Customer = payType.Customer.Name;
+            line.Memo = p.Description;
             _lines.Add(line);
 
             if (_payTypeCounts.ContainsKey(payType.QuickbooksPayType))

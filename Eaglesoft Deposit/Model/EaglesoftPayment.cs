@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2007-2012 Halo3 Consulting, LLC
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Eaglesoft_Deposit.Business_Objects;
 
-namespace Eaglesoft_Deposit.Workers
+namespace Eaglesoft_Deposit.Model
 {
-    public class LoadEaglesoftDataWorkerResults
+    public class EaglesoftPayment 
     {
-        public DailyDeposit Deposit;
-        public List<Refund> Refunds;
-        public LoadEaglesoftDataWorkerResults(DailyDeposit deposit, List<Refund> refunds)
+        public Int32 TxnId { get; set; }
+        public String Description { get; set; }
+        public EaglesoftPaymentType EaglesoftPayType { get; set; }
+        public Double Amount { get; set; }
+        public String CheckNumber { get; set; }
+
+        public override string ToString()
         {
-            this.Deposit = deposit;
-            this.Refunds = refunds;
+            return String.Format("{0} {1:c}", Description, Amount);
         }
-    }
+      }
+
+
+
 }

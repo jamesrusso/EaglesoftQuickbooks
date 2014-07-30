@@ -28,6 +28,7 @@ namespace Eaglesoft_Deposit.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDepositConfiguration));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
@@ -35,14 +36,17 @@ namespace Eaglesoft_Deposit.Forms
             this.btnMoveUp = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.columnMemo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.columnPayTypes = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnAddDeposit = new System.Windows.Forms.Button();
             this.btnEditDeposit = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnOK = new System.Windows.Forms.Button();
+            this.columnPaymentTypes = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.depositConfigBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.buttonCancel = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.depositConfigBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -108,10 +112,12 @@ namespace Eaglesoft_Deposit.Forms
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AllowUserToResizeColumns = false;
             this.dataGridView1.AllowUserToResizeRows = false;
+            this.dataGridView1.AutoGenerateColumns = false;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.columnMemo,
-            this.columnPayTypes});
+            this.columnPaymentTypes});
+            this.dataGridView1.DataSource = this.depositConfigBindingSource;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(3, 3);
             this.dataGridView1.MultiSelect = false;
@@ -128,20 +134,11 @@ namespace Eaglesoft_Deposit.Forms
             // columnMemo
             // 
             this.columnMemo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.columnMemo.FillWeight = 40F;
+            this.columnMemo.DataPropertyName = "Memo";
+            this.columnMemo.FillWeight = 70F;
             this.columnMemo.HeaderText = "Memo";
             this.columnMemo.Name = "columnMemo";
             this.columnMemo.ReadOnly = true;
-            this.columnMemo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // columnPayTypes
-            // 
-            this.columnPayTypes.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.columnPayTypes.FillWeight = 60F;
-            this.columnPayTypes.HeaderText = "Payment Types";
-            this.columnPayTypes.Name = "columnPayTypes";
-            this.columnPayTypes.ReadOnly = true;
-            this.columnPayTypes.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // btnAddDeposit
             // 
@@ -180,20 +177,46 @@ namespace Eaglesoft_Deposit.Forms
             // 
             // btnOK
             // 
+            this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOK.Location = new System.Drawing.Point(507, 197);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 4;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
-            this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
+            // 
+            // columnPaymentTypes
+            // 
+            this.columnPaymentTypes.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.columnPaymentTypes.DataPropertyName = "PayTypeStrings";
+            this.columnPaymentTypes.FillWeight = 30F;
+            this.columnPaymentTypes.HeaderText = "Payment Types";
+            this.columnPaymentTypes.Name = "columnPaymentTypes";
+            this.columnPaymentTypes.ReadOnly = true;
+            // 
+            // depositConfigBindingSource
+            // 
+            this.depositConfigBindingSource.DataSource = typeof(Eaglesoft_Deposit.Model.DepositConfiguration);
+            // 
+            // buttonCancel
+            // 
+            this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.buttonCancel.Location = new System.Drawing.Point(426, 197);
+            this.buttonCancel.Name = "buttonCancel";
+            this.buttonCancel.Size = new System.Drawing.Size(75, 23);
+            this.buttonCancel.TabIndex = 5;
+            this.buttonCancel.Text = "Cancel";
+            this.buttonCancel.UseVisualStyleBackColor = true;
             // 
             // frmDepositConfiguration
             // 
+            this.AcceptButton = this.btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(605, 225);
             this.ControlBox = false;
+            this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -208,6 +231,7 @@ namespace Eaglesoft_Deposit.Forms
             this.groupBox1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.depositConfigBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -223,7 +247,9 @@ namespace Eaglesoft_Deposit.Forms
         private System.Windows.Forms.Button btnAddDeposit;
         private System.Windows.Forms.Button btnMoveDown;
         private System.Windows.Forms.Button btnMoveUp;
+        private System.Windows.Forms.BindingSource depositConfigBindingSource;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnMemo;
-        private System.Windows.Forms.DataGridViewTextBoxColumn columnPayTypes;
+        private System.Windows.Forms.DataGridViewTextBoxColumn columnPaymentTypes;
+        private System.Windows.Forms.Button buttonCancel;
     }
 }

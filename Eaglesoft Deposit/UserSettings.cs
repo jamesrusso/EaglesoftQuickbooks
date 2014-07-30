@@ -70,21 +70,5 @@ namespace Eaglesoft_Deposit
                 this["Configuration"] = value;
             }
         }
-            [UserScopedSetting]
-        public Configuration.RefundConfiguration RefundConfiguration
-        {
-            get
-            {
-                if ((Configuration.RefundConfiguration)this["RefundConfiguration"] == null)
-                    this["RefundConfiguration"] = new Configuration.RefundConfiguration();
-
-                return (Configuration.RefundConfiguration)this["RefundConfiguration"];
-            }
-            set
-            {
-                this["RefundConfiguration"] = value;
-            }
-        }
     }
-    
 }

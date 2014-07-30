@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -14,7 +15,9 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <OldToolsVersion>2.0</OldToolsVersion>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -27,10 +30,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,6 +41,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,13 +54,21 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Interop.QBFC11, Version=11.0.0.29, Culture=neutral, PublicKeyToken=31d8aec643e18259" />
+    <Reference Include="Dapper">
+      <HintPath>..\packages\Dapper.1.26\lib\net40\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="EmitMapper">
+      <HintPath>..\packages\EmitMapper.1.0.0\lib\EmitMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="iAnywhere.Data.SQLAnywhere.v4.0, Version=16.0.0.19154, Culture=neutral, PublicKeyToken=f222fc4333e0d400, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -68,17 +78,38 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Business Objects\CheckToWrite.cs" />
+    <Compile Include="Business Objects\Eaglesoft.cs" />
     <Compile Include="Business Objects\Deposit.cs" />
-    <Compile Include="Business Objects\DailyTransactionRange.cs" />
+    <Compile Include="Forms\frmDatabaseConnect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmDatabaseConnect.Designer.cs">
+      <DependentUpon>frmDatabaseConnect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmRefreshExternalData.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmRefreshExternalData.Designer.cs">
+      <DependentUpon>frmRefreshExternalData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmRefundTypeMappings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmRefundTypeMappings.Designer.cs">
+      <DependentUpon>frmRefundTypeMappings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\DTO\RefundMappingDTO.cs" />
+    <Compile Include="Model\DTO\PayTypeMappingDTO.cs" />
+    <Compile Include="Model\EaglesoftBulkPayment.cs" />
+    <Compile Include="Model\Eaglesoft\DailyTransactionRange.cs" />
     <Compile Include="Business Objects\DepositLine.cs" />
-    <Compile Include="Business Objects\ESAdjustmentType.cs" />
-    <Compile Include="Business Objects\Payment.cs" />
+    <Compile Include="Model\Eaglesoft\EaglesoftPaymentType.cs" />
+    <Compile Include="Model\Eaglesoft\EaglesoftAdjustmentType.cs" />
     <Compile Include="Business Objects\DailyDeposit.cs" />
-    <Compile Include="Business Objects\Refund.cs" />
     <Compile Include="Configuration.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EaglesoftDatabase.cs" />
     <Compile Include="Forms\frmDateSelect.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -97,12 +128,6 @@
     <Compile Include="Forms\frmDepositConfiguration.Designer.cs">
       <DependentUpon>frmDepositConfiguration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmInitialConfiguration.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmInitialConfiguration.Designer.cs">
-      <DependentUpon>frmInitialConfiguration.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,22 +140,40 @@
     <Compile Include="Forms\frmPayTypeMappings.Designer.cs">
       <DependentUpon>frmPayTypeMappings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmRefundConfiguration.cs">
-      <SubType>Form</SubType>
+    <Compile Include="Model\DepositConfiguration.cs">
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Forms\frmRefundConfiguration.Designer.cs">
-      <DependentUpon>frmRefundConfiguration.cs</DependentUpon>
+    <Compile Include="Model\DepositConfigPayType.cs">
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Forms\frmSplash.cs">
-      <SubType>Form</SubType>
+    <Compile Include="Model\EaglesoftPayment.cs">
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Forms\frmSplash.Designer.cs">
-      <DependentUpon>frmSplash.cs</DependentUpon>
+    <Compile Include="Model\PaytypeMapping.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Model\Quickbooks\QuickbooksAccount.cs" />
+    <Compile Include="Model\Quickbooks\QuickbooksCustomer.cs" />
+    <Compile Include="Model\Quickbooks\QuickbooksPaytype.cs" />
+    <Compile Include="Model\EaglesoftRefund.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Model\RefundTypeMapping.cs">
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="Program.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Workers\RefreshDataWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <EmbeddedResource Include="Forms\frmDatabaseConnect.resx">
+      <DependentUpon>frmDatabaseConnect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmRefreshExternalData.resx">
+      <DependentUpon>frmRefreshExternalData.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmDateSelect.resx">
       <DependentUpon>frmDateSelect.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -143,10 +186,6 @@
       <DependentUpon>frmDepositConfiguration.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmInitialConfiguration.resx">
-      <DependentUpon>frmInitialConfiguration.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -155,13 +194,8 @@
       <DependentUpon>frmPayTypeMappings.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmRefundConfiguration.resx">
-      <DependentUpon>frmRefundConfiguration.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmSplash.resx">
-      <DependentUpon>frmSplash.cs</DependentUpon>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="Forms\frmRefundTypeMappings.resx">
+      <DependentUpon>frmRefundTypeMappings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -174,6 +208,17 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.DepositConfig.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.DepositConfigPayType.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.DepositConfigRefundType.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.PayTypeMapping.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.PaytypeMappingDTO.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.QuickbooksAccount.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.QuickbooksCustomer.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.QuickbooksPaytype.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.RefundTypeMapping.datasource" />
+    <None Include="Properties\DataSources\Eaglesoft_Deposit.Model.RefundTypeMappingDTO.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -190,7 +235,6 @@
     <Compile Include="UserSettings.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Workers\LoadEaglesoftDataWorkerResults.cs" />
     <Compile Include="Workers\QBDepositWorker.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -206,6 +250,11 @@
     <Content Include="LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
@@ -221,14 +270,28 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.SQL.Server.Compact.3.5">
       <Visible>False</Visible>
       <ProductName>SQL Server Compact 3.5</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Properties\DataSources\" />
+    <COMReference Include="QBFC13Lib">
+      <Guid>{0CB030A6-7B72-42CE-B92A-849B4A4A2CFB}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

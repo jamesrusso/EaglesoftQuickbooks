@@ -18,20 +18,29 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Eaglesoft_Deposit.Business_Objects
+namespace Eaglesoft_Deposit.Model
 {
-    public class ESAdjustmentType
+    public class EaglesoftAdjustmentType
     {
-        private Int16 _id;
-        private String _description;
-        public Int16 Id { get { return _id; }}
-        public String Description { get { return _description; } }
+        public Int32 Id { get; set; }
+        public String Description { get; set; }
 
-        public ESAdjustmentType(Int16 id, String description)
+        public override bool Equals(object obj)
         {
-            _id = id;
-            _description = description;
+            EaglesoftAdjustmentType that = obj as EaglesoftAdjustmentType;
+
+            if (that == null)
+                return false;
+
+            if (this.Id == that.Id)
+                return true;
+
+            return false;
         }
-        
+
+        public override int GetHashCode()
+        {
+            return 0;
+        }
     }
 }

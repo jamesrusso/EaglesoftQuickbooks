@@ -21,32 +21,45 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.Linq;
+using Eaglesoft_Deposit.Model;
 
 namespace Eaglesoft_Deposit.Forms
 {
     public partial class frmDepositConfiguration : Form
     {
         Configuration _configuration = UserSettings.getInstance().Configuration;
-        Dictionary<int, Configuration.DepositConfig> rowMappings = new Dictionary<int, Configuration.DepositConfig>();
-        BindingList<Configuration.DepositConfig> _depositConfigs;
+        Dictionary<int, DepositConfiguration> rowMappings = new Dictionary<int, DepositConfiguration>();
+        BindingList<DepositConfiguration> _depositConfigurations;
 
-        public frmDepositConfiguration()
-        {
+        public frmDepositConfiguration(List<DepositConfiguration> depositConfigurations)
+        { 
             InitializeComponent();
-            columnMemo.DataPropertyName = "Memo";
-            columnPayTypes.DataPropertyName = "PayTypeStrings";
-            dataGridView1.AutoGenerateColumns = false;
-            _configuration.Deposits.Sort();
-            _depositConfigs = new BindingList<Configuration.DepositConfig>(_configuration.Deposits);
-            dataGridView1.DataSource = _configuration.Deposits;
+            _depositConfigurations = new BindingList<DepositConfiguration>(depositConfigurations);
+            depositConfigBindingSource.DataSource = _depositConfigurations;
+        }
+
+        /**
+         * Return all PayTypes which belong to no deposit configurations. This is something which is on the quickbooks
+         * side of the PayType, but that Paytype is contained in no deposit.
+         * 
+         */
+        public List<QuickbooksPaytype> getUnconfiguredQuickbookPayTypes()
+        {
+            List<QuickbooksPaytype> allQuickBooksPayTypes = _configuration.PayTypeMappings.Select(payTypeMapping => payTypeMapping.QuickbooksPayType).ToList();
+            List<DepositConfigPayType> configured = _depositConfigurations.SelectMany(x => x.QuickBooksPaymentTypes).ToList();
+            List<QuickbooksPaytype> configuredQB = configured.Select(x => x.QuickbooksPaytype).ToList();
+            
+            return allQuickBooksPayTypes.Where(x => !configuredQB.Any(y => x.Equals(y))).ToList();
         }
 
         private void btnAddDeposit_Click(object sender, EventArgs e)
         {
-            BindingList<String> list = _configuration.getUnconfiguredQuickbookPayTypes();
-            Configuration.DepositConfig newConfig = new Configuration.DepositConfig();
-            frmDeposit frmDeposit = new frmDeposit(list, newConfig);
-            if (list.Count == 0)
+            List<QuickbooksPaytype> availableQuickbooksPayTypes = getUnconfiguredQuickbookPayTypes();
+            DepositConfiguration newConfig = new DepositConfiguration();
+            frmDeposit frmDeposit = new frmDeposit(availableQuickbooksPayTypes, newConfig);
+            
+            if (availableQuickbooksPayTypes.Count == 0)
             {
                 MessageBox.Show("All payment types are already configured, you must remove a payment type from an existing deposit first.");
                 return;
@@ -54,22 +67,7 @@ namespace Eaglesoft_Deposit.Forms
 
             if (frmDeposit.ShowDialog() == DialogResult.OK)
             {
-                _depositConfigs.Add(newConfig);
-            }
-        }
-
-        private void editDeposit(Configuration.DepositConfig depositConfig)
-        {
-            BindingList<String> list = _configuration.getUnconfiguredQuickbookPayTypes();
-            Configuration.DepositConfig config = dataGridView1.SelectedRows[0].DataBoundItem as Configuration.DepositConfig;
-            Configuration.DepositConfig editedConfig = config.Clone();
-            frmDeposit frmDeposit = new frmDeposit(list, editedConfig);
-            frmDeposit.Text = "Edit Deposit: " + config.Memo;
-            if (frmDeposit.ShowDialog() == DialogResult.OK)
-            {
-
-                _depositConfigs[_configuration.Deposits.IndexOf(config)] = editedConfig;
-                _depositConfigs.ResetItem(_configuration.Deposits.IndexOf(editedConfig));
+                _depositConfigurations.Add(newConfig);
             }
         }
 
@@ -78,8 +76,8 @@ namespace Eaglesoft_Deposit.Forms
             if (dataGridView1.SelectedRows.Count == 0)
                 return;
 
-            Configuration.DepositConfig config = dataGridView1.SelectedRows[0].DataBoundItem as Configuration.DepositConfig;
-            _configuration.Deposits.Remove(config);
+            DepositConfiguration selectedItem = dataGridView1.SelectedRows[0].DataBoundItem as DepositConfiguration;
+            _depositConfigurations.Remove(selectedItem);
         }
 
         private void btnEditDeposit_Click(object sender, EventArgs e)
@@ -87,7 +85,16 @@ namespace Eaglesoft_Deposit.Forms
             if (dataGridView1.SelectedRows.Count == 0)
                 return;
 
-            editDeposit(dataGridView1.SelectedRows[0].DataBoundItem as Configuration.DepositConfig);
+            List<QuickbooksPaytype> availableQuickbooksPayTypes = getUnconfiguredQuickbookPayTypes();
+            DepositConfiguration originalConfig = dataGridView1.SelectedRows[0].DataBoundItem as DepositConfiguration;
+            DepositConfiguration editedConfig = originalConfig.Clone();
+            frmDeposit frmDeposit = new frmDeposit(availableQuickbooksPayTypes, editedConfig);
+            frmDeposit.Text = "Edit Deposit: " + originalConfig.Memo;
+            if (frmDeposit.ShowDialog() == DialogResult.OK)
+            {
+                _depositConfigurations[_depositConfigurations.IndexOf(originalConfig)] = editedConfig;
+                _depositConfigurations.ResetItem(_depositConfigurations.IndexOf(editedConfig));
+            }
         }
 
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
@@ -104,11 +111,6 @@ namespace Eaglesoft_Deposit.Forms
             }
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
         private void dataGridView1_SelectionChanged_1(object sender, EventArgs e)
         {
 
@@ -123,7 +125,7 @@ namespace Eaglesoft_Deposit.Forms
                 btnEditDeposit.Enabled = true;
             }
 
-            
+
             if (dataGridView1.SelectedRows.Count == 0 || dataGridView1.SelectedRows.Count > 1)
             {
                 btnMoveUp.Enabled = false;
@@ -156,17 +158,16 @@ namespace Eaglesoft_Deposit.Forms
             if (indexToMove == 0)
                 return;
 
-            Configuration.DepositConfig config = _configuration.Deposits[indexToMove];
+            DepositConfiguration config = _configuration.Deposits[indexToMove];
             _configuration.Deposits.Remove(config);
             _configuration.Deposits.Insert(indexToMove - 1, config);
             dataGridView1.Rows[indexToMove - 1].Selected = true;
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                ((Configuration.DepositConfig)row.DataBoundItem).Order = row.Index;
+                ((DepositConfiguration)row.DataBoundItem).Order = row.Index;
             }
 
         }
-
 
         private void btnMoveDown_Click(object sender, EventArgs e)
         {
@@ -178,15 +179,14 @@ namespace Eaglesoft_Deposit.Forms
             if (indexToMove == dataGridView1.Rows.Count)
                 return;
 
-            Configuration.DepositConfig config = _configuration.Deposits[indexToMove];
+            DepositConfiguration config = _configuration.Deposits[indexToMove];
             _configuration.Deposits.Remove(config);
             _configuration.Deposits.Insert(indexToMove + 1, config);
             dataGridView1.Rows[indexToMove + 1].Selected = true;
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                ((Configuration.DepositConfig)row.DataBoundItem).Order = row.Index;
+                ((DepositConfiguration)row.DataBoundItem).Order = row.Index;
             }
         }
-
     }
 }

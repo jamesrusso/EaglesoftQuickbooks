@@ -29,10 +29,10 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Interop.QBFC11;
-using Eaglesoft_Deposit.Business_Objects;
+using Eaglesoft_Deposit.Model;
 using Eaglesoft_Deposit.Workers;
 
 namespace Eaglesoft_Deposit.Forms
@@ -41,11 +41,10 @@ namespace Eaglesoft_Deposit.Forms
 
     public partial class frmMain : Form
     {
-        private List<Payment> payments = new List<Payment>();
-        private List<Refund> refunds = new List<Refund>();
+        private List<EaglesoftPayment> payments = new List<EaglesoftPayment>();
+        private List<EaglesoftRefund> refunds = new List<EaglesoftRefund>();
         private Configuration configuration;
         private LoadEaglesoftDataWorker eaglesoftLoadDataWorker;
-        
         private Queue<DateTime> datesToRun = new Queue<DateTime>();
 
         public frmMain()
@@ -77,17 +76,17 @@ namespace Eaglesoft_Deposit.Forms
                 return;
             }
 
-            IList<String> availablePayTypes = configuration.getUnconfiguredQuickbookPayTypes();
+            IList<QuickbooksPaytype> availablePayTypes = configuration.getUnconfiguredQuickbookPayTypes();
             if (availablePayTypes.Count > 0)
             {
                 String s = "The below paytypes have are not\n" +
-                    "associated with a deposit. All paytype\n" +
+                    "associated with a deposit. All paytypes\n" +
                     "must be assocated with a deposit before\n" +
                     "you can import the data into quickbooks.\n\n";
 
-                foreach (String qbPayType in availablePayTypes)
+                foreach (QuickbooksPaytype qbPayType in availablePayTypes)
                 {
-                    s = s + qbPayType + "\n";
+                    s = s + qbPayType.Name + "\n";
                 }
 
                 MessageBox.Show(s, "Paytype assignment error");
@@ -110,12 +109,22 @@ namespace Eaglesoft_Deposit.Forms
                 eaglesoftLoadDataWorker.RunWorkerAsync();
             }
         }
+
+        private void RefreshData()
+        {
+             new frmRefreshExternalData().ShowDialog(this);
+        }
         
         private void setupPaymentTypesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            frmPayTypeMappings f = new frmPayTypeMappings();
+            RefreshData();
+            Configuration config = UserSettings.getInstance().Configuration;
+            List<PaytypeMappingDTO> paytypeMappingDTOs = config.ToPaytypeMappingDTOs();
+
+            frmPayTypeMappings f = new frmPayTypeMappings(paytypeMappingDTOs);
             if (f.ShowDialog() == DialogResult.OK)
             {
+                config.FromPaytypeMappingDTOs(paytypeMappingDTOs);
                 UserSettings.getInstance().Save();
 
                 if (UserSettings.getInstance().Configuration.Deposits.Count == 0)
@@ -129,20 +138,6 @@ namespace Eaglesoft_Deposit.Forms
                     }
                 }
             }
-        }
-
-        private void setupDepositsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            frmDepositConfiguration frm = new frmDepositConfiguration();
-            frm.ShowDialog();
-            UserSettings.getInstance().Save();
-        }
-
-        private void setupRefundsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            frmRefundConfiguration frm = new frmRefundConfiguration();
-            frm.ShowDialog();
-            UserSettings.getInstance().Save();
         }
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -164,11 +159,8 @@ namespace Eaglesoft_Deposit.Forms
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            Point p = Properties.Settings.Default.MainFormLocation;
-            this.WindowState = Properties.Settings.Default.MainFormState;
-            this.Size = Properties.Settings.Default.MainFormSize;
-            this.Location = p;
-        }
+          
+  }
         
         private void todayToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -196,7 +188,7 @@ namespace Eaglesoft_Deposit.Forms
 
             if (e.Cancelled)
             {
-                setStatus("operation canceled...");
+                setStatus("Operation canceled...");
                 toolStripProgressBar1.Visible = false;
                 setupDepositsToolStripMenuItem.Enabled = true;
                 importDataToolStripMenuItem.Enabled = true;
@@ -220,15 +212,15 @@ namespace Eaglesoft_Deposit.Forms
                 return;
             }
 
-            LoadEaglesoftDataWorkerResults results = e.Result as LoadEaglesoftDataWorkerResults;
-            if (results.Deposit == null && results.Refunds == null) {
+            DailyDeposit deposit = e.Result as DailyDeposit;
+            if (deposit.Empty) {
                 setStatus(String.Format("no payments or refund results for {0:MM/dd/yy}", worker.Date));
                 processDepositQueue();
             } else  {
                 toolStripProgressBar1.Value = 0;
                 toolStripProgressBar1.Visible = false;
                 setStatus("starting export to quickbooks...");
-                QBDepositWorker qbWorker = new QBDepositWorker(results);
+                QBDepositWorker qbWorker = new QBDepositWorker(deposit);
                 qbWorker.ProgressChanged += new ProgressChangedEventHandler(workerProgressUpdate);
                 qbWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(qbWorker_RunWorkerCompleted);
                 qbWorker.RunWorkerAsync();
@@ -288,6 +280,7 @@ namespace Eaglesoft_Deposit.Forms
                 Stream s = odf.OpenFile();
                 XmlSerializer xml = new XmlSerializer(typeof(Configuration));
                 UserSettings.getInstance().Configuration = xml.Deserialize(s) as Configuration;
+                UserSettings.getInstance().Save();
             }
         }
 
@@ -319,7 +312,8 @@ namespace Eaglesoft_Deposit.Forms
                 setupToolStripMenuItem.Enabled = false;
                 importDataToolStripMenuItem.Enabled = false;
                 cancelImportToolStripMenuItem.Visible = true;
-                runDepositFor(datesToRun.Dequeue());
+                DateTime dateToRun = datesToRun.Dequeue();
+                runDepositFor(dateToRun);
 
                 if (datesToRun.Count > 0)
                 {
@@ -359,12 +353,46 @@ namespace Eaglesoft_Deposit.Forms
             eaglesoftLoadDataWorker.CancelAsync();
         }
 
-        private void reRunInitialSetupToolStripMenuItem_Click(object sender, EventArgs e)
+        private void setupRefundTypesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UserSettings.getInstance().Configuration.InitialConfigurationComplete = false;
-            UserSettings.getInstance().Save();
-            frmInitialConfiguration frm = new frmInitialConfiguration();
-            frm.ShowDialog();
+            Configuration config = UserSettings.getInstance().Configuration;
+            var refundMappingDTOs = config.ToRefundMappingDTOs();
+
+            frmRefundTypeMappings f = new frmRefundTypeMappings(refundMappingDTOs);
+            if (f.ShowDialog() == DialogResult.OK)
+            {
+                config.FromRefundMappingDTOs(refundMappingDTOs);
+                UserSettings.getInstance().Save();
+            }
         }
+
+        private void setupDepositsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<DepositConfiguration> depositConfigurations = configuration.Deposits.Select(item => item.Clone()).ToList();
+            frmDepositConfiguration frm = new frmDepositConfiguration(depositConfigurations);
+            frm.ShowDialog();
+
+            if (frm.DialogResult == System.Windows.Forms.DialogResult.OK)
+            {
+                configuration.Deposits.Clear();
+                configuration.Deposits.AddRange(depositConfigurations);
+                UserSettings.getInstance().Save();
+            }
+        }
+
+        private void setupESDatabaseConnectionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmDatabaseConnect frm = new frmDatabaseConnect();
+            frm.ConnectionString = UserSettings.getInstance().Configuration.EaglesoftConnectionString;
+            frm.ShowDialog(this);
+
+            if (frm.DialogResult == DialogResult.OK)
+            {
+
+                UserSettings.getInstance().Configuration.EaglesoftConnectionString = frm.ConnectionString;
+                UserSettings.getInstance().Save();  
+            }
+        }
+
     }
 }

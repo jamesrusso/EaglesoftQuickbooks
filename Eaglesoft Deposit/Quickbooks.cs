@@ -18,8 +18,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Eaglesoft_Deposit.Business_Objects;
-using Interop.QBFC11;
+using Eaglesoft_Deposit.Model;
+using QBFC13Lib;
 
 namespace Eaglesoft_Deposit
 {
@@ -66,12 +66,12 @@ namespace Eaglesoft_Deposit
             }
         }
 
-        public List<String> getIncomeAccounts()
+        public List<QuickbooksAccount> getIncomeAccounts()
         {
             return getAccounts(ENAccountType.atIncome);
         }
 
-        public List<String> getBankAccounts()
+        public List<QuickbooksAccount> getBankAccounts()
         {
             return getAccounts(ENAccountType.atBank);
         }
@@ -80,9 +80,9 @@ namespace Eaglesoft_Deposit
         /// Obtain a list of all QuickBooks accounts.
         /// </summary>
         /// <returns>a list of quickbooks accounts</returns>
-        private List<String> getAccounts(ENAccountType type)
+        private List<QuickbooksAccount> getAccounts(ENAccountType type)
         {
-            List<String> account = new List<string>();
+            List<QuickbooksAccount> account = new List<QuickbooksAccount>();
             IMsgSetRequest msgRequest = qbMgr.CreateMsgSetRequest("US", 4, 0);
             msgRequest.Attributes.OnError = ENRqOnError.roeStop;
             IAccountQuery query = msgRequest.AppendAccountQueryRq();
@@ -92,7 +92,7 @@ namespace Eaglesoft_Deposit
 
 
             for (int i = 0; qbAccounts != null && i < qbAccounts.Count; i++)
-                account.Add(qbAccounts.GetAt(i).FullName.GetValue());
+                account.Add(new QuickbooksAccount() { Name = qbAccounts.GetAt(i).FullName.GetValue() });
 
             return account;
         }
@@ -114,17 +114,17 @@ namespace Eaglesoft_Deposit
         /// Obtain a listing of all valid payment types in Quickbooks.
         /// </summary>
         /// <returns>a list of all quickbooks payment types</returns>
-        public List<String> getPaymentTypes()
+        public List<QuickbooksPaytype> getPaymentTypes()
         {
-            List<String> paymentTypes = new List<string>();
+            List<QuickbooksPaytype> paymentTypes = new List<QuickbooksPaytype>();
             IMsgSetRequest msgRequest = qbMgr.CreateMsgSetRequest("US", 4, 0);
             msgRequest.Attributes.OnError = ENRqOnError.roeStop;
             msgRequest.AppendPaymentMethodQueryRq();
             IMsgSetResponse response = qbMgr.DoRequests(msgRequest);
             IPaymentMethodRetList payment_methods = (IPaymentMethodRetList)response.ResponseList.GetAt(0).Detail;
 
-            for (int i = 0; i < payment_methods.Count; i++)
-                paymentTypes.Add(payment_methods.GetAt(i).Name.GetValue());
+            for (int i = 0; i < payment_methods.Count; i++) 
+                paymentTypes.Add(new QuickbooksPaytype() { Name = payment_methods.GetAt(i).Name.GetValue() });
 
             return paymentTypes;
         }
@@ -133,9 +133,9 @@ namespace Eaglesoft_Deposit
         /// Obtain a listing of all quickbooks customers.
         /// </summary>
         /// <returns>a list of all quickbooks customers</returns>
-        public List<String> getCustomers()
+        public List<QuickbooksCustomer> getCustomers()
         {
-            List<String> customers = new List<string>();
+            List<QuickbooksCustomer> customers = new List<QuickbooksCustomer>();
             IMsgSetRequest msgRequest = qbMgr.CreateMsgSetRequest("US", 4, 0);
             msgRequest.Attributes.OnError = ENRqOnError.roeStop;
             msgRequest.AppendCustomerQueryRq();
@@ -143,59 +143,18 @@ namespace Eaglesoft_Deposit
             ICustomerRetList qbCustomers = (ICustomerRetList)response.ResponseList.GetAt(0).Detail;
 
             for (int i = 0; qbCustomers != null && i < qbCustomers.Count; i++)
-                customers.Add(qbCustomers.GetAt(i).Name.GetValue());
+                customers.Add(new QuickbooksCustomer() { Name = qbCustomers.GetAt(i).Name.GetValue() });
 
             return customers;
-
         }
 
-        
-        internal List<string> getExpenseAccounts()
+
+        internal List<QuickbooksAccount> getExpenseAccounts()
         {
                  return getAccounts(ENAccountType.atExpense);
         }
 
-           private IDepositAdd _depositAddRq;
         
-        /// <summary>
-        /// Create a deposit perform it.
-        /// </summary>
-        /// <param name="deposit">The request where this deposit will be added.</param>
-        public void performDeposit(DailyDeposit dailyDeposit) {
-            foreach (Deposit deposit in dailyDeposit.getDeposits())  { 
-
-                IMsgSetRequest qbRequests = qbMgr.CreateMsgSetRequest("US", 4, 0);
-                qbRequests.Attributes.OnError = ENRqOnError.roeStop;
-                _depositAddRq = qbRequests.AppendDepositAddRq();
-                _depositAddRq.Memo.SetValue(deposit.DepositConfig.Memo);
-                _depositAddRq.TxnDate.SetValue(dailyDeposit.DepositDate);
-                _depositAddRq.DepositToAccountRef.FullName.SetValue(deposit.DepositConfig.BankAccount);
-
-                foreach (DepositLine line in deposit.Lines) { 
-                    IDepositLineAdd depositLineAdd = _depositAddRq.DepositLineAddList.Append();
-                    depositLineAdd.ORDepositLineAdd.DepositInfo.EntityRef.FullName.SetValue(line.Customer);
-                    depositLineAdd.ORDepositLineAdd.DepositInfo.AccountRef.FullName.SetValue(line.IncomeAccount);
-                    depositLineAdd.ORDepositLineAdd.DepositInfo.Amount.SetValue(line.Amount);
-                    
-                    if (line.CheckNumber != null) 
-                        depositLineAdd.ORDepositLineAdd.DepositInfo.CheckNumber.SetValue(line.CheckNumber.Substring(0, Math.Min(line.CheckNumber.Length, 11)));
-
-                    depositLineAdd.ORDepositLineAdd.DepositInfo.PaymentMethodRef.FullName.SetValue(line.PaymentMethod);
-
-                    if (line.Memo != null) 
-                        depositLineAdd.ORDepositLineAdd.DepositInfo.Memo.SetValue(line.Memo);
-                }
-
-                IMsgSetResponse response = qbMgr.DoRequests(qbRequests);
-                List<IResponse> errors = new List<IResponse>();
-                for (int i = 0; i < response.ResponseList.Count; i++)
-                {
-                    if (response.ResponseList.GetAt(i).StatusCode != 0)
-                    {
-                        errors.Add(response.ResponseList.GetAt(i));
-                    }
-                }
-            }
-        }
+      
     }
 }

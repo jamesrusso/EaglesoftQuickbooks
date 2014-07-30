@@ -33,13 +33,13 @@ namespace Eaglesoft_Deposit.Forms
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setupPaymentTypesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setupRefundTypesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setupDepositsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setupRefundsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.configurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setLastRunTimeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.reRunInitialSetupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setupESDatabaseConnectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sinceLastImportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.todayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,56 +68,56 @@ namespace Eaglesoft_Deposit.Forms
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(772, 424);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1298, 801);
             this.tableLayoutPanel1.TabIndex = 5;
             // 
             // menuStrip1
             // 
             this.menuStrip1.AllowMerge = false;
-            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.setupToolStripMenuItem,
             this.importDataToolStripMenuItem,
             this.cancelImportToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(772, 30);
-            this.menuStrip1.TabIndex = 17;
+            this.menuStrip1.Size = new System.Drawing.Size(325, 24);
+            this.menuStrip1.TabIndex = 20;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // setupToolStripMenuItem
             // 
             this.setupToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.setupPaymentTypesToolStripMenuItem,
+            this.setupRefundTypesToolStripMenuItem,
             this.setupDepositsToolStripMenuItem,
-            this.setupRefundsToolStripMenuItem,
             this.configurationToolStripMenuItem,
             this.setLastRunTimeToolStripMenuItem,
-            this.reRunInitialSetupToolStripMenuItem});
+            this.setupESDatabaseConnectionToolStripMenuItem});
             this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
-            this.setupToolStripMenuItem.Size = new System.Drawing.Size(47, 26);
+            this.setupToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
             this.setupToolStripMenuItem.Text = "Setup";
             // 
             // setupPaymentTypesToolStripMenuItem
             // 
             this.setupPaymentTypesToolStripMenuItem.Name = "setupPaymentTypesToolStripMenuItem";
-            this.setupPaymentTypesToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.setupPaymentTypesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
             this.setupPaymentTypesToolStripMenuItem.Text = "Setup Payment Types";
             this.setupPaymentTypesToolStripMenuItem.Click += new System.EventHandler(this.setupPaymentTypesToolStripMenuItem_Click);
+            // 
+            // setupRefundTypesToolStripMenuItem
+            // 
+            this.setupRefundTypesToolStripMenuItem.Name = "setupRefundTypesToolStripMenuItem";
+            this.setupRefundTypesToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+            this.setupRefundTypesToolStripMenuItem.Text = "Setup Refund Types";
+            this.setupRefundTypesToolStripMenuItem.Click += new System.EventHandler(this.setupRefundTypesToolStripMenuItem_Click);
             // 
             // setupDepositsToolStripMenuItem
             // 
             this.setupDepositsToolStripMenuItem.Name = "setupDepositsToolStripMenuItem";
-            this.setupDepositsToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.setupDepositsToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
             this.setupDepositsToolStripMenuItem.Text = "Setup Deposits";
             this.setupDepositsToolStripMenuItem.Click += new System.EventHandler(this.setupDepositsToolStripMenuItem_Click);
-            // 
-            // setupRefundsToolStripMenuItem
-            // 
-            this.setupRefundsToolStripMenuItem.Name = "setupRefundsToolStripMenuItem";
-            this.setupRefundsToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.setupRefundsToolStripMenuItem.Text = "Setup Refunds";
-            this.setupRefundsToolStripMenuItem.Click += new System.EventHandler(this.setupRefundsToolStripMenuItem_Click);
             // 
             // configurationToolStripMenuItem
             // 
@@ -125,36 +125,35 @@ namespace Eaglesoft_Deposit.Forms
             this.exportToolStripMenuItem,
             this.importToolStripMenuItem});
             this.configurationToolStripMenuItem.Name = "configurationToolStripMenuItem";
-            this.configurationToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.configurationToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
             this.configurationToolStripMenuItem.Text = "Configuration";
             // 
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
             // importToolStripMenuItem
             // 
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
             // 
             // setLastRunTimeToolStripMenuItem
             // 
             this.setLastRunTimeToolStripMenuItem.Name = "setLastRunTimeToolStripMenuItem";
-            this.setLastRunTimeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.setLastRunTimeToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
             this.setLastRunTimeToolStripMenuItem.Text = "Set Last Run Time";
-            this.setLastRunTimeToolStripMenuItem.Click += new System.EventHandler(this.setLastRunTimeToolStripMenuItem_Click);
             // 
-            // reRunInitialSetupToolStripMenuItem
+            // setupESDatabaseConnectionToolStripMenuItem
             // 
-            this.reRunInitialSetupToolStripMenuItem.Name = "reRunInitialSetupToolStripMenuItem";
-            this.reRunInitialSetupToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.reRunInitialSetupToolStripMenuItem.Text = "Re-Run initial Setup";
-            this.reRunInitialSetupToolStripMenuItem.Click += new System.EventHandler(this.reRunInitialSetupToolStripMenuItem_Click);
+            this.setupESDatabaseConnectionToolStripMenuItem.Name = "setupESDatabaseConnectionToolStripMenuItem";
+            this.setupESDatabaseConnectionToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
+            this.setupESDatabaseConnectionToolStripMenuItem.Text = "Setup ES Database Connection";
+            this.setupESDatabaseConnectionToolStripMenuItem.Click += new System.EventHandler(this.setupESDatabaseConnectionToolStripMenuItem_Click);
             // 
             // importDataToolStripMenuItem
             // 
@@ -163,37 +162,36 @@ namespace Eaglesoft_Deposit.Forms
             this.todayToolStripMenuItem,
             this.specificDayToolStripMenuItem});
             this.importDataToolStripMenuItem.Name = "importDataToolStripMenuItem";
-            this.importDataToolStripMenuItem.Size = new System.Drawing.Size(77, 26);
+            this.importDataToolStripMenuItem.Size = new System.Drawing.Size(82, 20);
             this.importDataToolStripMenuItem.Text = "Import Data";
             // 
             // sinceLastImportToolStripMenuItem
             // 
             this.sinceLastImportToolStripMenuItem.Name = "sinceLastImportToolStripMenuItem";
-            this.sinceLastImportToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.sinceLastImportToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.sinceLastImportToolStripMenuItem.Text = "Since Last Import";
             this.sinceLastImportToolStripMenuItem.Click += new System.EventHandler(this.sinceLastImportToolStripMenuItem_Click);
             // 
             // todayToolStripMenuItem
             // 
             this.todayToolStripMenuItem.Name = "todayToolStripMenuItem";
-            this.todayToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.todayToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.todayToolStripMenuItem.Text = "Today";
             this.todayToolStripMenuItem.Click += new System.EventHandler(this.todayToolStripMenuItem_Click);
             // 
             // specificDayToolStripMenuItem
             // 
             this.specificDayToolStripMenuItem.Name = "specificDayToolStripMenuItem";
-            this.specificDayToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.specificDayToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.specificDayToolStripMenuItem.Text = "Specific Day";
             this.specificDayToolStripMenuItem.Click += new System.EventHandler(this.specificDayToolStripMenuItem_Click);
             // 
             // cancelImportToolStripMenuItem
             // 
             this.cancelImportToolStripMenuItem.Name = "cancelImportToolStripMenuItem";
-            this.cancelImportToolStripMenuItem.Size = new System.Drawing.Size(86, 26);
+            this.cancelImportToolStripMenuItem.Size = new System.Drawing.Size(93, 20);
             this.cancelImportToolStripMenuItem.Text = "Cancel Import";
             this.cancelImportToolStripMenuItem.Visible = false;
-            this.cancelImportToolStripMenuItem.Click += new System.EventHandler(this.cancelImportToolStripMenuItem_Click);
             // 
             // textBox1
             // 
@@ -205,7 +203,7 @@ namespace Eaglesoft_Deposit.Forms
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(766, 388);
+            this.textBox1.Size = new System.Drawing.Size(1292, 765);
             this.textBox1.TabIndex = 18;
             // 
             // statusStrip1
@@ -235,18 +233,17 @@ namespace Eaglesoft_Deposit.Forms
             // 
             // frmMain
             // 
-            this.ClientSize = new System.Drawing.Size(772, 446);
+            this.ClientSize = new System.Drawing.Size(1298, 823);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(0, 324);
-            this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(780, 480);
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Eaglesoft Quickbooks Deposit";
-            this.Load += new System.EventHandler(this.frmMain_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
+            this.Load += new System.EventHandler(this.frmMain_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -262,24 +259,24 @@ namespace Eaglesoft_Deposit.Forms
 
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setupPaymentTypesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setupRefundTypesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setupDepositsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem setupRefundsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem importDataToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem configurationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setLastRunTimeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importDataToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sinceLastImportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem todayToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem specificDayToolStripMenuItem;
-        private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.ToolStripMenuItem setLastRunTimeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripMenuItem cancelImportToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem reRunInitialSetupToolStripMenuItem;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.ToolStripMenuItem setupESDatabaseConnectionToolStripMenuItem;
     }
 }
 

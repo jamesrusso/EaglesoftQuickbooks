@@ -17,51 +17,116 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Eaglesoft_Deposit.Model;
 
-namespace Eaglesoft_Deposit.Business_Objects
+namespace Eaglesoft_Deposit.Model
 {
     /**
      * A Daily deposit consists of one or more deposit objects. 
      *
      */
+
     public class DailyDeposit
     {
-        Configuration _configuration;
-        DateTime _depositDate;
-
-        public DateTime DepositDate
-        {
-            get { return _depositDate; }
-            set { _depositDate = value; }
-        }
-        private Dictionary<Configuration.DepositConfig, Stack<Deposit>> _deposits;
+        public Configuration Configuration { get; set; }
+        public DateTime DepositDate { get; set; }
+        public List<CheckToWrite> ChecksToWrite { get; set; }
+        public Dictionary<Model.DepositConfiguration, Stack<Deposit>> Deposits;
 
         public DailyDeposit(DateTime date)
         {
-            _configuration = UserSettings.getInstance().Configuration;
-            _deposits = new Dictionary<Configuration.DepositConfig, Stack<Deposit>>();
-            _depositDate = date;
+            Configuration = UserSettings.getInstance().Configuration;
+            Deposits = new Dictionary<Model.DepositConfiguration, Stack<Deposit>>();
+            ChecksToWrite = new List<CheckToWrite>();
+            DepositDate = date;
         }
 
-        public void addPayment(Payment p)
+
+        public void addRefund(EaglesoftRefund refund)
+        {
+
+            EaglesoftAdjustmentType adjustmentType = refund.AdjustmentType;
+
+            RefundTypeMapping mapping = Configuration.getRefundTypeByEaglesoftAdjustmentType(adjustmentType);
+
+            if (mapping.Enabled)
+            {
+                if (mapping.IssueCheck)
+                {
+                    writeRefundCheck(mapping, refund);
+                }
+                else
+                {
+                    addRefundToDeposit(mapping, refund);
+                }
+            }
+        }
+
+        private void addRefundToDeposit(RefundTypeMapping mapping, EaglesoftRefund refund)
+        {
+            DepositConfiguration depositConfig = Configuration.getDepositConfig(mapping.QuickbooksPaytype);
+            Deposit deposit = getDeposit(depositConfig, mapping.QuickbooksPaytype);
+            deposit.addRefund(refund);
+        }
+
+        private void writeRefundCheck(RefundTypeMapping mapping, EaglesoftRefund refund)
+        {
+            if (mapping.RefundCheckRecipient == RefundCheckRecipient.ResposibleParty)
+            {
+                ChecksToWrite.Add(new CheckToWrite() { 
+                    RecipientId = refund.PatientId,
+                    FullName = refund.FirstName+" "+refund.LastName,
+                    Address1 = refund.Address1,
+                    Address2 = refund.Address2,
+                    Amount = refund.Amount,
+                    City = refund.City,
+                    State = refund.State,
+                    Zip = refund.Zip,
+                    Memo = refund.Description,
+                    QbBankAccount = mapping.RefundCheckBankAccount.Name,
+                    QbIncomeAccount = mapping.IncomeAccount.Name
+                });
+
+
+            }
+            else if (mapping.RefundCheckRecipient == RefundCheckRecipient.InsuranceCompany)
+            {
+                ChecksToWrite.Add(new CheckToWrite()
+                {
+                    FullName = refund.InsuranceCompany_Name,
+                    Address1 = refund.InsuranceCompany_Address1,
+                    Address2 = refund.InsuranceCompany_Address2,
+                    City = refund.InsuranceCompany_City,
+                    State = refund.InsuranceCompany_State,
+                    Zip = refund.InsuranceCompany_Zip,
+                    Amount = refund.Amount,
+                    Memo = refund.Description,
+                    QbBankAccount = mapping.RefundCheckBankAccount.Name,
+                    QbIncomeAccount = mapping.IncomeAccount.Name
+                });
+            }
+        }
+
+        public void addPayment(EaglesoftPayment p)
         {
             // First get the deposit configuration according to the Eaglesoft payment type. We use this to
             // determine which Quickbooks payment type to use. 
-            Configuration.PayType payType = _configuration.getPayTypeByEaglesoftPayType(p.PayType);
+            PaytypeMapping payType = Configuration.getPayTypeByEaglesoftPayType(p.EaglesoftPayType);
 
             // Find the deposit configuration for this quickbooks pay type.
-            Configuration.DepositConfig depositConfig = _configuration.getDepositConfig(payType.QuickbooksPayType);
+            DepositConfiguration depositConfig = Configuration.getDepositConfig(payType.QuickbooksPayType);
 
-            Deposit deposit = getDeposit(depositConfig,  payType.QuickbooksPayType);
+            Deposit deposit = getDeposit(depositConfig, payType.QuickbooksPayType);
             deposit.addPayment(p);
         }
 
-        private Deposit getDeposit(Configuration.DepositConfig depositConfig, String qbPayType) { 
+        private Deposit getDeposit(DepositConfiguration depositConfig, QuickbooksPaytype qbPayType)
+        {
             // Lets see if we already have that deposit. 
-            if (_deposits.ContainsKey(depositConfig))
+            if (Deposits.ContainsKey(depositConfig))
             {
                 // We already have that one, lets see if it is full or not. 
-                Stack<Deposit> stack = _deposits[depositConfig];
+                Stack<Deposit> stack = Deposits[depositConfig];
                 Deposit topDeposit = stack.Peek();
 
                 if (topDeposit.isFull(qbPayType))
@@ -81,7 +146,7 @@ namespace Eaglesoft_Deposit.Business_Objects
                 Deposit newDeposit = new Deposit(depositConfig);
                 Stack<Deposit> newStack = new Stack<Deposit>();
                 newStack.Push(newDeposit);
-                _deposits[depositConfig] = newStack;
+                Deposits[depositConfig] = newStack;
                 return newDeposit;
             }
         }
@@ -89,9 +154,11 @@ namespace Eaglesoft_Deposit.Business_Objects
         public List<Deposit> getDeposits()
         {
             List<Deposit> deposits = new List<Deposit>();
-            foreach (Configuration.DepositConfig config in _deposits.Keys) {
-                Stack<Deposit> stack = _deposits[config];
-                foreach (Deposit d in stack) {
+            foreach (DepositConfiguration config in Deposits.Keys)
+            {
+                Stack<Deposit> stack = Deposits[config];
+                foreach (Deposit d in stack)
+                {
                     deposits.Add(d);
                 }
             }
@@ -102,7 +169,9 @@ namespace Eaglesoft_Deposit.Business_Objects
 
         internal void removeAll()
         {
-            _deposits.Clear();
+            Deposits.Clear();
         }
+
+        public Boolean Empty { get { return false; } }
     }
 }
