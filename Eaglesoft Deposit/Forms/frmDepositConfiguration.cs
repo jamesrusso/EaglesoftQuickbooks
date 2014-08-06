@@ -158,15 +158,11 @@ namespace Eaglesoft_Deposit.Forms
             if (indexToMove == 0)
                 return;
 
-            DepositConfiguration config = _configuration.Deposits[indexToMove];
-            _configuration.Deposits.Remove(config);
-            _configuration.Deposits.Insert(indexToMove - 1, config);
+            DepositConfiguration selectedConfig = _depositConfigurations[indexToMove];
+            _depositConfigurations.RemoveAt(indexToMove);
+            _depositConfigurations.Insert(indexToMove - 1, selectedConfig);
             dataGridView1.Rows[indexToMove - 1].Selected = true;
-            foreach (DataGridViewRow row in dataGridView1.Rows)
-            {
-                ((DepositConfiguration)row.DataBoundItem).Order = row.Index;
-            }
-
+            _depositConfigurations.Select((config, index) => config.Order = index);
         }
 
         private void btnMoveDown_Click(object sender, EventArgs e)
@@ -179,14 +175,11 @@ namespace Eaglesoft_Deposit.Forms
             if (indexToMove == dataGridView1.Rows.Count)
                 return;
 
-            DepositConfiguration config = _configuration.Deposits[indexToMove];
-            _configuration.Deposits.Remove(config);
-            _configuration.Deposits.Insert(indexToMove + 1, config);
+            DepositConfiguration selectedConfig = _depositConfigurations[indexToMove];
+            _depositConfigurations.RemoveAt(indexToMove);
+            _depositConfigurations.Insert(indexToMove + 1, selectedConfig);
             dataGridView1.Rows[indexToMove + 1].Selected = true;
-            foreach (DataGridViewRow row in dataGridView1.Rows)
-            {
-                ((DepositConfiguration)row.DataBoundItem).Order = row.Index;
-            }
+            _depositConfigurations.Select((config, index) => config.Order = index);
         }
     }
 }
