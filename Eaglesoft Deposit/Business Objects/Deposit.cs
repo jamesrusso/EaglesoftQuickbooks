@@ -78,6 +78,7 @@ namespace Eaglesoft_Deposit.Model
             line.PaymentMethod = payType.QuickbooksPayType.Name;
             line.Customer = payType.Customer.Name;
             line.Memo = p.Description;
+            line.CheckNumber = p.CheckNumber;
             _lines.Add(line);
 
             if (_payTypeCounts.ContainsKey(payType.QuickbooksPayType))

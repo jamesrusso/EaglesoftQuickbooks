@@ -61,12 +61,18 @@ namespace Eaglesoft_Deposit.Workers
 
                 es.Connect();
                 DailyTransactionRange range = es.getTransactionRangeFor(Date);
+                if (range == null)
+                {
+                    ReportProgress(100, "No data available");
+                    return;
+                }
                 queryCount = 0;
                 totalQueryCount = es.getPaymentCount(range) + es.getRefundCount(range);
 
                 List<EaglesoftBulkPayment> bulkPaymentsProcessed = new List<EaglesoftBulkPayment>();
                 List<Int32> paymentTxnIds = es.getPaymentTransactionIds(range);
                 List<Int32> refundTxnIds = es.getRefundTransactionIds(range);
+                e.Result = dailyDeposit;
 
                 foreach (Int32 paymentTxnId in paymentTxnIds)
                 {
@@ -109,7 +115,7 @@ namespace Eaglesoft_Deposit.Workers
 
                 }
 
-                e.Result = dailyDeposit;
+                
             }
             finally
             {

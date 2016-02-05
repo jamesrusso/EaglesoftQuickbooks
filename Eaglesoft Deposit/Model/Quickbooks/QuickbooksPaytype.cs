@@ -9,6 +9,11 @@ namespace Eaglesoft_Deposit.Model
     {
         public String Name { get; set; }
 
+        public override string ToString()
+        {
+            return String.Format("{0}", Name);
+        }
+
         public override bool Equals(object obj)
         {
             QuickbooksPaytype that = obj as QuickbooksPaytype;
@@ -18,5 +23,12 @@ namespace Eaglesoft_Deposit.Model
 
             return this.Name.Equals(that.Name);
         }
+
+        public override int GetHashCode()
+        {
+            return this.Name.GetHashCode();
+        }
+
+        
     }
 }

@@ -132,10 +132,11 @@ namespace Eaglesoft_Deposit.Model
 
         public DailyTransactionRange getTransactionRangeFor(DateTime date)
         {
-            var result = _databaseConnection.Query<DailyTransactionRange>(@"SELECT MIN(start_tran_num) as FromTxn, MAX(END_TRAN_NUM) as ToTxn from eod where date(time_ran)  = :selectedDate",
+            var result = _databaseConnection.Query<DailyTransactionRange>(@"SELECT time_ran,MIN(start_tran_num) as FromTxn, MAX(END_TRAN_NUM) as ToTxn from eod where date(time_ran)  = :selectedDate group by time_ran",
                 new { selectedDate = date });
 
-            return result.First<DailyTransactionRange>();
+            
+            return result.DefaultIfEmpty(null).FirstOrDefault<DailyTransactionRange>();
         }
 
         public Int32 getPaymentCount(DailyTransactionRange range)
@@ -143,13 +144,13 @@ namespace Eaglesoft_Deposit.Model
             var result = _databaseConnection.Query<Int32>(@"SELECT count(*) FROM TRANSACTIONS T WHERE T.TYPE NOT IN ('S','C','D') and amount <> 0 and t.status <> 'D' and TRAN_NUM >= :startTran and TRAN_NUM <= :EndTran",
                 new { StartTran = range.FromTxn, EndTran = range.ToTxn });
 
-            return result.First<Int32>();
+            return result.DefaultIfEmpty(0).FirstOrDefault<Int32>();
         }
 
         public List<Int32> getPaymentTransactionIds(DailyTransactionRange range)
         {
             var result = _databaseConnection.Query<Int32>(@"
-                    SELECT T.TRAN_NUM FROM TRANSACTIONS T WHERE T.TYPE NOT IN ('S','C','D') and amount <> 0 and t.status <> 'D' and tran_num >= :StartTran and tran_num <= :EndTran
+                    SELECT T.TRAN_NUM FROM TRANSACTIONS T WHERE T.TYPE NOT IN ('S','C','D','F') and amount <> 0 and t.status <> 'D' and tran_num >= :StartTran and tran_num <= :EndTran
             ", new { StartTran = range.FromTxn, EndTran = range.ToTxn });
 
             return result.ToList<Int32>();
@@ -273,6 +274,15 @@ namespace Eaglesoft_Deposit.Model
                         WHERE
                                     T.TRAN_NUM = :Id", new { Id = txnId }).First<EaglesoftPaymentDBResult>();
 
+            var regex = new Regex(@"(\d+)\s*");
+            var checkNumber = (String)null;
+            
+            var match = regex.Match(result.Description);
+            if (match.Success)
+            {
+                checkNumber = match.Groups[1].Value;             
+            }
+            
             if (result.BulkPaymentId != null)
                 return getBulkPayment(result.BulkPaymentId.Value);
             else
@@ -285,7 +295,7 @@ namespace Eaglesoft_Deposit.Model
             {
                 Amount = result.paymentAmount,
                 Description = Description,
-                CheckNumber = result.Description,
+                CheckNumber = checkNumber,
                 EaglesoftPayType = Configuration.EaglesoftPaytypes.First(a => a.Id == result.PayTypeId)
             };
             }
