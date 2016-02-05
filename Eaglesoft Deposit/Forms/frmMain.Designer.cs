@@ -29,7 +29,7 @@ namespace Eaglesoft_Deposit.Forms
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setupPaymentTypesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,44 +45,37 @@ namespace Eaglesoft_Deposit.Forms
             this.todayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.specificDayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelImportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.tableLayoutPanel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // textBox1
             // 
-            this.tableLayoutPanel1.AutoScroll = true;
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.menuStrip1, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.textBox1, 0, 1);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1298, 801);
-            this.tableLayoutPanel1.TabIndex = 5;
+            this.textBox1.BackColor = System.Drawing.Color.Black;
+            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.ForeColor = System.Drawing.Color.ForestGreen;
+            this.textBox1.Location = new System.Drawing.Point(0, 0);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(1826, 1176);
+            this.textBox1.TabIndex = 19;
             // 
             // menuStrip1
             // 
             this.menuStrip1.AllowMerge = false;
-            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.setupToolStripMenuItem,
             this.importDataToolStripMenuItem,
             this.cancelImportToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(325, 24);
-            this.menuStrip1.TabIndex = 20;
+            this.menuStrip1.Size = new System.Drawing.Size(1826, 24);
+            this.menuStrip1.TabIndex = 21;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // setupToolStripMenuItem
@@ -147,6 +140,7 @@ namespace Eaglesoft_Deposit.Forms
             this.setLastRunTimeToolStripMenuItem.Name = "setLastRunTimeToolStripMenuItem";
             this.setLastRunTimeToolStripMenuItem.Size = new System.Drawing.Size(236, 22);
             this.setLastRunTimeToolStripMenuItem.Text = "Set Last Run Time";
+            this.setLastRunTimeToolStripMenuItem.Click += new System.EventHandler(this.setLastRunTimeToolStripMenuItem_Click);
             // 
             // setupESDatabaseConnectionToolStripMenuItem
             // 
@@ -192,19 +186,7 @@ namespace Eaglesoft_Deposit.Forms
             this.cancelImportToolStripMenuItem.Size = new System.Drawing.Size(93, 20);
             this.cancelImportToolStripMenuItem.Text = "Cancel Import";
             this.cancelImportToolStripMenuItem.Visible = false;
-            // 
-            // textBox1
-            // 
-            this.textBox1.BackColor = System.Drawing.Color.Black;
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.ForeColor = System.Drawing.Color.ForestGreen;
-            this.textBox1.Location = new System.Drawing.Point(3, 33);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(1292, 765);
-            this.textBox1.TabIndex = 18;
+            this.cancelImportToolStripMenuItem.Click += new System.EventHandler(this.cancelImportToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -233,8 +215,9 @@ namespace Eaglesoft_Deposit.Forms
             // 
             // frmMain
             // 
-            this.ClientSize = new System.Drawing.Size(1298, 823);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.ClientSize = new System.Drawing.Size(1826, 1198);
+            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(0, 324);
@@ -244,8 +227,6 @@ namespace Eaglesoft_Deposit.Forms
             this.Text = "Eaglesoft Quickbooks Deposit";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -258,9 +239,9 @@ namespace Eaglesoft_Deposit.Forms
         #endregion
 
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setupPaymentTypesToolStripMenuItem;
@@ -270,13 +251,12 @@ namespace Eaglesoft_Deposit.Forms
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setLastRunTimeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setupESDatabaseConnectionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importDataToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sinceLastImportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem todayToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem specificDayToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cancelImportToolStripMenuItem;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.ToolStripMenuItem setupESDatabaseConnectionToolStripMenuItem;
     }
 }
 

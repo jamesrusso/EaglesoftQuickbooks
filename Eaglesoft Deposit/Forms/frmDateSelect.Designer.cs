@@ -36,7 +36,7 @@
             // button1
             // 
             this.button1.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.button1.Location = new System.Drawing.Point(121, 183);
+            this.button1.Location = new System.Drawing.Point(187, 194);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 1;
@@ -46,7 +46,7 @@
             // button2
             // 
             this.button2.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.button2.Location = new System.Drawing.Point(18, 183);
+            this.button2.Location = new System.Drawing.Point(106, 194);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 2;
@@ -55,7 +55,7 @@
             // 
             // monthCalendar1
             // 
-            this.monthCalendar1.Location = new System.Drawing.Point(18, 18);
+            this.monthCalendar1.Location = new System.Drawing.Point(24, 18);
             this.monthCalendar1.MaxSelectionCount = 1;
             this.monthCalendar1.MinDate = new System.DateTime(2008, 1, 1, 0, 0, 0, 0);
             this.monthCalendar1.Name = "monthCalendar1";
@@ -65,7 +65,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(210, 218);
+            this.ClientSize = new System.Drawing.Size(274, 229);
             this.Controls.Add(this.monthCalendar1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);

@@ -27,6 +27,7 @@ using System.Data.Odbc;
 using System.Data.SqlClient;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using System.Deployment.Application;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -54,6 +55,16 @@ namespace Eaglesoft_Deposit.Forms
             eaglesoftLoadDataWorker = new LoadEaglesoftDataWorker();
             eaglesoftLoadDataWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(eaglesoftLoadDataWorker_Completed);
             eaglesoftLoadDataWorker.ProgressChanged += new ProgressChangedEventHandler(workerProgressUpdate);
+            try
+            {
+                this.Text += String.Format(" (v{0})", ApplicationDeployment.CurrentDeployment.CurrentVersion);
+            }
+            catch (InvalidDeploymentException e)
+            {
+                // Ignore.
+
+            }
+            
         }
 
         public void setStatus(String s)
