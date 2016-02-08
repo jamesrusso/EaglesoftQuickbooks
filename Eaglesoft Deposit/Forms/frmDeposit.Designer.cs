@@ -29,6 +29,7 @@ namespace Eaglesoft_Deposit.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDeposit));
             this.btnOK = new System.Windows.Forms.Button();
             this.lblMemo = new System.Windows.Forms.Label();
             this.txtBoxMemo = new System.Windows.Forms.TextBox();
@@ -211,6 +212,7 @@ namespace Eaglesoft_Deposit.Forms
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmDeposit";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

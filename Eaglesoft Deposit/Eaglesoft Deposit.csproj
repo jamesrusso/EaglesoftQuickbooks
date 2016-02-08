@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Eaglesoft_Deposit</RootNamespace>
     <AssemblyName>Eaglesoft Deposit</AssemblyName>
-    <ApplicationIcon>eaglesoftquickbooks.ico</ApplicationIcon>
+    <ApplicationIcon>Hopstarter-Sleek-Xp-Basic-Money.ico</ApplicationIcon>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -30,7 +30,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>\\server\software\eaglesoft-deposit\</InstallUrl>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>12</ApplicationRevision>
+    <ApplicationRevision>14</ApplicationRevision>
     <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -257,6 +257,7 @@
     <Content Include="ChangeLog.txt" />
     <Content Include="eaglesoftquickbooks-16x16.ico" />
     <Content Include="eaglesoftquickbooks.ico" />
+    <Content Include="Hopstarter-Sleek-Xp-Basic-Money.ico" />
     <Content Include="IntuitLibs.vdproj" />
     <Content Include="LICENSE.txt" />
   </ItemGroup>

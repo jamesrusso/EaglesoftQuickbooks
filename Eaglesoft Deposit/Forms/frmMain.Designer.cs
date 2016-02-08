@@ -58,11 +58,11 @@ namespace Eaglesoft_Deposit.Forms
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.ForeColor = System.Drawing.Color.ForestGreen;
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
+            this.textBox1.Location = new System.Drawing.Point(0, 24);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(1826, 1176);
+            this.textBox1.Size = new System.Drawing.Size(1826, 1152);
             this.textBox1.TabIndex = 19;
             // 
             // menuStrip1
@@ -216,8 +216,8 @@ namespace Eaglesoft_Deposit.Forms
             // frmMain
             // 
             this.ClientSize = new System.Drawing.Size(1826, 1198);
-            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(0, 324);
